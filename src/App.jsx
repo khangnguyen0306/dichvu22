@@ -1,0 +1,62 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { DataProvider } from '@/contexts/DataContext.jsx';
+import { AuthProvider } from '@/contexts/AuthContext.jsx';
+import Layout from '@/components/Layout.jsx';
+import Home from '@/pages/Home.jsx';
+import Login from '@/pages/Login.jsx';
+import Register from '@/pages/Register.jsx';
+import VerifyEmail from '@/pages/VerifyEmail.jsx';
+import ForgotPassword from '@/pages/ForgotPassword.jsx';
+import Services from '@/pages/Services.jsx';
+import ServiceDetail from '@/pages/ServiceDetail.jsx';
+import Dashboard from '@/pages/Dashboard.jsx';
+import Profile from '@/pages/Profile.jsx';
+import AdminDashboard from '@/pages/AdminDashboard.jsx';
+import ProtectedRoute from '@/components/ProtectedRoute.jsx';
+import AboutUs from '@/pages/AboutUs.jsx';
+import Contact from '@/pages/Contact.jsx';
+import { Toaster } from "@/components/ui/toaster";
+
+function App() {
+    return (
+        <AuthProvider>
+            <DataProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        
+                        <Route path="/" element={<Layout />}>
+                            <Route index element={<Home />} />
+                            <Route path="about" element={<AboutUs />} />
+                            <Route path="contact" element={<Contact />} />
+                            <Route path="services" element={<Services />} />
+                            <Route path="services/:serviceId" element={<ServiceDetail />} />
+                            <Route path="profile" element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="dashboard" element={
+                                <ProtectedRoute roles={['seller']}>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="admin" element={
+                                <ProtectedRoute roles={['admin']}>
+                                    <AdminDashboard />
+                                </ProtectedRoute>
+                            } />
+                        </Route>
+                    </Routes>
+                </Router>
+                <Toaster />
+            </DataProvider>
+        </AuthProvider>
+    );
+}
+
+export default App;

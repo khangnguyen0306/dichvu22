@@ -1,0 +1,5 @@
++ create file service  with API authentication: Login, register, forgotpass, verifyEmail
++ create file service CRUD product for seller
++ create file service CRUD category for admin 
++ create file service CRUD user for admin 
++ create file service booking service 
