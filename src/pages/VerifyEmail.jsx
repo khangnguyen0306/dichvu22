@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -10,112 +10,39 @@ const VerifyEmail = () => {
     const { token } = useParams();
     const navigate = useNavigate();
     const { toast } = useToast();
-    const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
-    const [message, setMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    useEffect(() => {
-        const verifyEmail = async () => {
-            if (!token) {
-                setStatus('error');
-                setMessage('Token xác thực không hợp lệ.');
-                setIsLoading(false);
-                return;
-            }
-
-            try {
-                const result = await authService.verifyEmail(token);
-                setStatus('success');
-                setMessage('Email đã được xác thực thành công! Bạn có thể đăng nhập ngay bây giờ.');
-                
-                toast({
-                    title: "Xác thực thành công!",
-                    description: "Email của bạn đã được xác thực. Bạn có thể đăng nhập ngay bây giờ.",
-                });
-            } catch (error) {
-                setStatus('error');
-                setMessage(error.message || 'Xác thực email thất bại. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
-                
-                toast({
-                    title: "Xác thực thất bại",
-                    description: error.message || 'Xác thực email thất bại. Vui lòng thử lại.',
-                    variant: "destructive",
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        verifyEmail();
-    }, [token, navigate, toast]);
-
-    const handleResendVerification = async () => {
+    const handleVerifyEmail = async () => {
+        if (!token) {
+            setError('Token xác thực không hợp lệ.');
+            return;
+        }
+        
         setIsLoading(true);
-        try {
-            // Note: This would need the user's email, which we don't have in this context
-            // You might want to store the email in localStorage during registration
-            const userEmail = localStorage.getItem('pendingVerificationEmail');
-            
-            if (!userEmail) {
-                setMessage('Không thể gửi lại email xác thực. Vui lòng đăng ký lại.');
-                return;
-            }
+        setError('');
 
-            await authService.resendVerificationEmail(userEmail);
-            setMessage('Email xác thực đã được gửi lại. Vui lòng kiểm tra hộp thư của bạn.');
+        try {
+            await authService.verifyEmail(token);
             
             toast({
-                title: "Email đã được gửi lại",
-                description: "Vui lòng kiểm tra hộp thư của bạn.",
+                title: "Xác thực thành công",
+                description: "Email của bạn đã được xác thực thành công!",
             });
+
+            // Chuyển về trang login sau khi xác thực thành công
+            navigate('/login');
         } catch (error) {
-            setMessage(error.message || 'Không thể gửi lại email xác thực. Vui lòng thử lại.');
+            const errorMessage = error.message || 'Xác thực email thất bại. Vui lòng thử lại.';
+            setError(errorMessage);
             
             toast({
-                title: "Gửi lại email thất bại",
-                description: error.message || 'Không thể gửi lại email xác thực.',
+                title: "Xác thực thất bại",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const getStatusIcon = () => {
-        switch (status) {
-            case 'verifying':
-                return (
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
-                );
-            case 'success':
-                return (
-                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                );
-            case 'error':
-                return (
-                    <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </div>
-                );
-            default:
-                return null;
-        }
-    };
-
-    const getStatusColor = () => {
-        switch (status) {
-            case 'success':
-                return 'text-green-400';
-            case 'error':
-                return 'text-red-400';
-            default:
-                return 'text-blue-400';
         }
     };
 
@@ -133,69 +60,50 @@ const VerifyEmail = () => {
                     className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg"
                 >
                     <div className="text-center">
-                        <h1 className={`text-3xl font-bold ${getStatusColor()}`}>
-                            {status === 'verifying' && 'Đang Xác Thực...'}
-                            {status === 'success' && 'Xác Thực Thành Công!'}
-                            {status === 'error' && 'Xác Thực Thất Bại'}
+                        <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h1 className="text-3xl font-bold text-blue-400">
+                            Xác Thực Email
                         </h1>
                         <p className="text-gray-400 mt-2">
-                            {status === 'verifying' && 'Vui lòng chờ trong khi chúng tôi xác thực email của bạn...'}
-                            {status === 'success' && 'Email của bạn đã được xác thực thành công!'}
-                            {status === 'error' && 'Có lỗi xảy ra trong quá trình xác thực email.'}
+                            Nhấn nút bên dưới để xác thực email của bạn
                         </p>
                     </div>
 
-                    <div className="text-center">
-                        {getStatusIcon()}
+                    {error && (
+                        <div className="bg-red-900/50 border border-red-500 rounded-lg p-4">
+                            <p className="text-red-400 text-center">{error}</p>
+                        </div>
+                    )}
+
+                    <div className="space-y-4">
+                        <Button 
+                            onClick={handleVerifyEmail}
+                            disabled={isLoading || !token}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
+                        >
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Đang xác thực...
+                                </div>
+                            ) : (
+                                'Xác Thực Email'
+                            )}
+                        </Button>
+
+                        <div className="text-center space-y-2">
+                            <p className="text-sm text-gray-400">
+                                <Link to="/login" className="text-blue-400 hover:underline">Đăng nhập</Link> nếu đã có tài khoản
+                            </p>
+                            <p className="text-sm text-gray-400">
+                                Hoặc <Link to="/" className="text-blue-400 hover:underline">về trang chủ</Link>
+                            </p>
+                        </div>
                     </div>
-
-                    {!isLoading && (
-                        <div className="text-center space-y-4">
-                            <p className="text-gray-300">{message}</p>
-                            
-                            {status === 'success' && (
-                                <div className="space-y-3">
-                                    <Button 
-                                        onClick={() => navigate('/login')}
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
-                                    >
-                                        Đăng Nhập Ngay
-                                    </Button>
-                                    <p className="text-sm text-gray-400">
-                                        Hoặc <Link to="/" className="text-blue-400 hover:underline">về trang chủ</Link>
-                                    </p>
-                                </div>
-                            )}
-
-                            {status === 'error' && (
-                                <div className="space-y-3">
-                                    <Button 
-                                        onClick={handleResendVerification}
-                                        disabled={isLoading}
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
-                                    >
-                                        {isLoading ? 'Đang gửi...' : 'Gửi Lại Email Xác Thực'}
-                                    </Button>
-                                    <Button 
-                                        onClick={() => navigate('/register')}
-                                        variant="outline"
-                                        className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
-                                    >
-                                        Đăng Ký Lại
-                                    </Button>
-                                    <p className="text-sm text-gray-400">
-                                        Hoặc <Link to="/login" className="text-blue-400 hover:underline">đăng nhập</Link> nếu đã có tài khoản
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {isLoading && status === 'verifying' && (
-                        <div className="text-center">
-                            <p className="text-gray-300">Đang xác thực email...</p>
-                        </div>
-                    )}
                 </motion.div>
             </div>
         </>

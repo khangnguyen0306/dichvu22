@@ -1,14 +1,54 @@
-import { api, handleApiError } from './apiConfig';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+// Create axios instance with default config
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+api.interceptors.request.use(
+    (config) => {
+        // Lấy user từ localStorage và parse ra object
+        const userStr = localStorage.getItem('user');
+        let token = null;
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                token = user.token;
+            } catch (e) {
+                // Nếu parse lỗi thì bỏ qua
+            }
+        }
+        // Nếu không có token trong user, thử lấy trực tiếp từ localStorage (nếu bạn có lưu riêng)
+        if (!token) {
+            token = localStorage.getItem('token');
+        }
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Hàm xử lý lỗi chung (nếu muốn)
+export function handleApiError(error) {
+    return error.response?.data || { message: 'Request failed' };
+}
 
 // User Service for Admin
 export const userService = {
     // Get all users (with pagination and filters)
     async getUsers(params = {}) {
         try {
-            const response = await api.get('/admin/users', { params });
+            const response = await api.get('/users', { params });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get users failed' };
         }
     },
 
@@ -18,7 +58,7 @@ export const userService = {
             const response = await api.get(`/admin/users/${id}`);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get user by id failed' };
         }
     },
 
@@ -28,7 +68,7 @@ export const userService = {
             const response = await api.post('/admin/users', userData);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Create user failed' };
         }
     },
 
@@ -38,7 +78,7 @@ export const userService = {
             const response = await api.put(`/admin/users/${id}`, userData);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Update user failed' };
         }
     },
 
@@ -48,7 +88,7 @@ export const userService = {
             const response = await api.delete(`/admin/users/${id}`);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Delete user failed' };
         }
     },
 
@@ -58,7 +98,7 @@ export const userService = {
             const response = await api.patch(`/admin/users/${id}/status`, { status });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Update user status failed' };
         }
     },
 
@@ -68,7 +108,7 @@ export const userService = {
             const response = await api.patch(`/admin/users/${id}/role`, { role });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Update user role failed' };
         }
     },
 
@@ -78,7 +118,7 @@ export const userService = {
             const response = await api.post(`/admin/users/${id}/reset-password`, { newPassword });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Reset user password failed' };
         }
     },
 
@@ -88,7 +128,7 @@ export const userService = {
             const response = await api.get(`/admin/users/${id}/profile`);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get user profile failed' };
         }
     },
 
@@ -98,7 +138,7 @@ export const userService = {
             const response = await api.put(`/admin/users/${id}/profile`, profileData);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Update user profile failed' };
         }
     },
 
@@ -115,7 +155,7 @@ export const userService = {
             });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Upload user avatar failed' };
         }
     },
 
@@ -125,7 +165,7 @@ export const userService = {
             const response = await api.get(`/admin/users/role/${role}`, { params });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get users by role failed' };
         }
     },
 
@@ -137,7 +177,7 @@ export const userService = {
             });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Search users failed' };
         }
     },
 
@@ -149,7 +189,7 @@ export const userService = {
             });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get user analytics failed' };
         }
     },
 
@@ -159,7 +199,7 @@ export const userService = {
             const response = await api.post('/admin/users/bulk-update', { updates });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Bulk update users failed' };
         }
     },
 
@@ -169,7 +209,7 @@ export const userService = {
             const response = await api.post('/admin/users/bulk-delete', { userIds });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Bulk delete users failed' };
         }
     },
 
@@ -179,7 +219,7 @@ export const userService = {
             const response = await api.get('/admin/users/statistics');
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw error.response?.data || { message: 'Get user statistics failed' };
         }
     },
 
@@ -192,7 +232,7 @@ export const userService = {
             });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+                throw error.response?.data || { message: 'Export users failed' };
         }
     },
 };

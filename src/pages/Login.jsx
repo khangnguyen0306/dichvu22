@@ -29,12 +29,11 @@ const Login = () => {
             
             // Check if login was successful
             if (result.success) {
-                // Set user data in AuthContext
-                authLogin(result.data);
-                
+                const { token, ...user } = result.data;
+                authLogin(user);
                 toast({
                     title: "Đăng nhập thành công!",
-                    description: `Chào mừng trở lại, ${result.data.username}!`,
+                    description: `Chào mừng trở lại, ${user.username}!`,
                 });
                 
                 navigate(from, { replace: true });
@@ -80,7 +79,6 @@ const Login = () => {
                         <div>
                             <label className="text-sm font-bold text-gray-300 block mb-2">Email</label>
                             <input
-                                type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"

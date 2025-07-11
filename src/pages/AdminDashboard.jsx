@@ -1,18 +1,89 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useData } from '@/contexts/DataContext.jsx';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, User, Tag } from 'lucide-react';
+import { Edit, Trash2, User, Tag, ShoppingBag, Check, X } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { userService, shopService, categoryService } from '@/service';
 
 const AdminDashboard = () => {
-    const { users, setUsers, categories, setCategories } = useData();
     const [editingUser, setEditingUser] = useState(null);
     const [editingCategory, setEditingCategory] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState('');
+    const [newCategoryDescription, setNewCategoryDescription] = useState('');
     const { toast } = useToast();
+    const [users, setUsers] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [pendingShops, setPendingShops] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [filterRole, setFilterRole] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const getAllUsers = async () => {
+        try {
+            setIsLoading(true);
+            const params = {};
+            if (filterRole) params.role = filterRole;
+            if (searchKeyword.trim()) params.keyword = searchKeyword.trim();
+            
+            const response = await userService.getUsers(params);
+            // response.data là mảng user
+            setUsers(response.data);
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Không thể tải danh sách người dùng." });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const getAllCategories = async () => {
+        try {
+            const response = await categoryService.getCategories();
+            console.log(response.data);
+            setCategories(response.data);
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Không thể tải danh sách danh mục." });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const getPendingShops = async () => {
+        try {
+            setIsLoading(true);
+            const response = await shopService.getPendingShops();
+            console.log(response.data);
+            setPendingShops(response.data);
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Không thể tải danh sách shop chờ phê duyệt." });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleSearch = () => {
+        getAllUsers();
+
+    };
+
+    const handleResetFilter = () => {
+        setSearchKeyword('');
+        setFilterRole('');
+    };
+
+    useEffect(() => {
+        getAllUsers();
+        getAllCategories();
+        getPendingShops();
+    }, []);
+
+    useEffect(() => {
+        if (!searchKeyword && !filterRole) {
+            getAllUsers();
+        }
+    }, [searchKeyword, filterRole]);
 
     // User Management
     const handleUserUpdate = (e) => {
@@ -22,32 +93,103 @@ const AdminDashboard = () => {
         setEditingUser(null);
         toast({ title: "Thành công", description: "Thông tin người dùng đã được cập nhật." });
     };
+
     const deleteUser = (userId) => {
         setUsers(users.filter(u => u.id !== userId));
         toast({ title: "Thành công", description: "Người dùng đã được xóa." });
     };
 
+    // Shop Approval Management
+    const approveShop = async (shopId) => {
+        try {
+            await shopService.approveShop(shopId);
+            
+            
+            
+            toast({ 
+                title: "Thành công", 
+                description: "Shop đã được phê duyệt thành công." 
+            });
+            
+            // Refresh danh sách
+            getPendingShops();
+        } catch (error) {
+            toast({ 
+                title: "Lỗi", 
+                description: error.message || "Không thể phê duyệt shop." 
+            });
+        }
+    };
+
+    const rejectShop = async (shopId, reason = '') => {
+        try {
+            await shopService.rejectShop(shopId, reason);
+        
+            
+            toast({ 
+                title: "Thành công", 
+                description: "Shop đã bị từ chối." 
+            });
+            
+            // Refresh danh sách
+            getPendingShops();
+        } catch (error) {
+            toast({ 
+                title: "Lỗi", 
+                description: error.message || "Không thể từ chối shop." 
+            });
+        }
+    };
+
     // Category Management
-    const handleCategorySave = (e) => {
+    const handleCategorySave = async (e) => {
         e.preventDefault();
-        if (editingCategory.id) { // Update
-            setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: newCategoryName } : c));
-            toast({ title: "Thành công", description: "Danh mục đã được cập nhật." });
-        } else { // Add
-            setCategories([...categories, { id: Date.now(), name: newCategoryName }]);
-            toast({ title: "Thành công", description: "Danh mục mới đã được thêm." });
+        try {
+            if (editingCategory) { 
+                // Update
+                const result = await categoryService.updateCategory(editingCategory._id, { 
+                    name: newCategoryName.trim(),
+                    description: newCategoryDescription.trim()
+                });
+                console.log(result);
+                // Refresh categories list
+                getAllCategories();
+                toast({ title: "Thành công", description: "Danh mục đã được cập nhật." });
+            } else { 
+                // Add
+                const result = await categoryService.createCategory({ 
+                    name: newCategoryName.trim(),
+                    description: newCategoryDescription.trim()
+                });
+                console.log(result);
+                // Refresh categories list
+                getAllCategories();
+                toast({ title: "Thành công", description: "Danh mục mới đã được thêm." });
+            }
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Thao tác thất bại." });
         }
         setEditingCategory(null);
         setNewCategoryName('');
+        setNewCategoryDescription('');
     };
-    const deleteCategory = (catId) => {
-        setCategories(categories.filter(c => c.id !== catId));
-        toast({ title: "Thành công", description: "Danh mục đã được xóa." });
+
+    const deleteCategory = async (catId) => {
+        try {
+            const result = await categoryService.deleteCategory(catId);
+            console.log(result);
+            // Refresh categories list
+            getAllCategories();
+            toast({ title: "Thành công", description: "Danh mục đã được xóa." });
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Xóa danh mục thất bại." });
+        }
     };
 
     const startEditCategory = (category) => {
         setEditingCategory(category);
         setNewCategoryName(category.name);
+        setNewCategoryDescription(category.description || '');
     };
 
     return (
@@ -60,8 +202,9 @@ const AdminDashboard = () => {
                 <h1 className="text-4xl font-bold text-blue-400">Bảng Điều Khiển Quản Trị</h1>
 
                 <Tabs defaultValue="users" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+                    <TabsList className="grid w-full grid-cols-3 bg-gray-800">
                         <TabsTrigger value="users"><User className="mr-2 h-4 w-4" />Quản Lý Người Dùng</TabsTrigger>
+                        <TabsTrigger value="shop-approval"><ShoppingBag className="mr-2 h-4 w-4" />Phê Duyệt Shop</TabsTrigger>
                         <TabsTrigger value="categories"><Tag className="mr-2 h-4 w-4" />Quản Lý Danh Mục</TabsTrigger>
                     </TabsList>
                     <TabsContent value="users">
@@ -70,46 +213,76 @@ const AdminDashboard = () => {
                                 <CardTitle className="text-white">Danh sách người dùng</CardTitle>
                             </CardHeader>
                             <CardContent>
+                                {/* Search và Filter */}
+                                <div className="mb-6 flex flex-col md:flex-row gap-4">
+                                    <div className="flex-1">
+                                        <input
+                                            type="text"
+                                            placeholder="Tìm kiếm theo tên, email..."
+                                            value={searchKeyword}
+                                            onChange={(e) => setSearchKeyword(e.target.value)}
+                                            className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white placeholder-gray-400"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <select
+                                            value={filterRole}
+                                            onChange={(e) => setFilterRole(e.target.value)}
+                                            className="p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
+                                        >
+                                            <option value="">Tất cả vai trò</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="shop">Shop</option>
+                                            <option value="customer">Customer</option>
+                                        </select>
+                                        <Button 
+                                            onClick={handleSearch}
+                                            className="bg-blue-600 hover:bg-blue-700 px-6"
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? 'Đang tìm...' : 'Tìm kiếm'}
+                                        </Button>
+                                        <Button 
+                                            onClick={handleResetFilter}
+                                            variant="outline" 
+                                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                        >
+                                            Đặt lại
+                                        </Button>
+                                    </div>
+                                </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead className="bg-gray-700">
                                             <tr>
-                                                <th className="p-4">Tên</th>
+                                                <th className="p-4 text-center">STT</th>
+                                                <th className="p-4">Tên đăng nhập</th>
                                                 <th className="p-4">Email</th>
-                                                <th className="p-4">Vai trò</th>
+                                                <th className="p-4">Họ</th>
+                                                <th className="p-4">Tên</th>
+                                                <th className="p-4 text-center">Vai trò</th>
                                                 <th className="p-4 text-right">Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {users.map(user => (
-                                                <tr key={user.id} className="border-b border-gray-700">
-                                                    <td className="p-4">{user.name}</td>
-                                                    <td className="p-4">{user.email}</td>
-                                                    <td className="p-4">
-                                                        {editingUser?.id === user.id ? (
-                                                            <select value={editingUser.role} onChange={e => setEditingUser({...editingUser, role: e.target.value})} className="p-1 bg-gray-600 rounded">
-                                                                <option value="user">User</option>
-                                                                <option value="seller">Seller</option>
-                                                                <option value="admin">Admin</option>
-                                                            </select>
-                                                        ) : user.role}
+                                            {users.map((user, idx) => (
+                                                <tr key={user._id} className="border-b border-gray-700 hover:bg-gray-700/30 transition">
+                                                    <td className="p-4 text-center font-semibold text-gray-400">{idx + 1}</td>
+                                                    <td className="p-4 font-medium text-blue-300">{user.username}</td>
+                                                    <td className="p-4 text-gray-200">{user.email}</td>
+                                                    <td className="p-4 text-gray-200">{user.lastName}</td>
+                                                    <td className="p-4 text-gray-200">{user.firstName}</td>
+                                                    <td className="p-4 text-center">
+                                                        <span className={`px-2 py-1 rounded text-xs font-bold 
+                                                            ${user.role === 'admin' ? 'bg-blue-600 text-white' : user.role === 'seller' ? 'bg-green-600 text-white' : 'bg-gray-500 text-white'}`}>{user.role}</span>
                                                     </td>
                                                     <td className="p-4 flex space-x-2 justify-end">
-                                                        {editingUser?.id === user.id ? (
-                                                            <>
-                                                                <Button size="sm" onClick={handleUserUpdate}>Lưu</Button>
-                                                                <Button size="sm" variant="ghost" onClick={() => setEditingUser(null)}>Hủy</Button>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
-                                                                    <Edit className="h-5 w-5 text-blue-400" />
-                                                                </Button>
-                                                                <Button variant="ghost" size="icon" onClick={() => deleteUser(user.id)}>
-                                                                    <Trash2 className="h-5 w-5 text-red-400" />
-                                                                </Button>
-                                                            </>
-                                                        )}
+                                                        <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
+                                                            <Edit className="h-5 w-5 text-blue-400" />
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" onClick={() => deleteUser(user._id)}>
+                                                            <Trash2 className="h-5 w-5 text-red-400" />
+                                                        </Button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -119,34 +292,153 @@ const AdminDashboard = () => {
                             </CardContent>
                         </Card>
                     </TabsContent>
+                    
+                    <TabsContent value="shop-approval">
+                        <Card className="bg-gray-800/50 border-gray-700">
+                            <CardHeader>
+                                <CardTitle className="text-white flex items-center gap-2">
+                                    <ShoppingBag className="h-5 w-5" />
+                                    Danh sách Shop chờ phê duyệt
+                                    <span className="bg-yellow-500 text-black px-2 py-1 rounded-full text-sm font-bold">
+                                        {pendingShops.length}
+                                    </span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {pendingShops.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                                        <p className="text-gray-400 text-lg">Không có shop nào chờ phê duyệt</p>
+                                    </div>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-gray-700">
+                                                <tr>
+                                                    <th className="p-4 text-center">STT</th>
+                                                    <th className="p-4">Tên Shop</th>
+                                                    <th className="p-4">Chủ Shop</th>
+                                                    <th className="p-4">Email</th>
+                                                    <th className="p-4">Số điện thoại</th>
+                                                    <th className="p-4">Ngày đăng ký</th>
+                                                    <th className="p-4 text-center">Trạng thái</th>
+                                                    <th className="p-4 text-right">Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {pendingShops.map((shop, idx) => (
+                                                    <tr key={shop._id} className="border-b border-gray-700 hover:bg-gray-700/30 transition">
+                                                        <td className="p-4 text-center font-semibold text-gray-400">{idx + 1}</td>
+                                                        <td className="p-4 font-medium text-blue-300">{shop.shopName || shop.username}</td>
+                                                        <td className="p-4 text-gray-200">{shop.firstName} {shop.lastName}</td>
+                                                        <td className="p-4 text-gray-200">{shop.email}</td>
+                                                        <td className="p-4 text-gray-200">{shop.phone || 'Chưa cập nhật'}</td>
+                                                        <td className="p-4 text-gray-200">
+                                                            {new Date(shop.createdAt).toLocaleDateString('vi-VN')}
+                                                        </td>
+                                                        <td className="p-4 text-center">
+                                                            <span className="px-2 py-1 rounded text-xs font-bold bg-yellow-600 text-white">
+                                                                Chờ phê duyệt
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="flex space-x-2 justify-end">
+                                                                <Button 
+                                                                    size="sm"
+                                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                                    onClick={() => approveShop(shop._id)}
+                                                                >
+                                                                    <Check className="h-4 w-4 mr-1" />
+                                                                    Phê duyệt
+                                                                </Button>
+                                                                <Button 
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    className="bg-red-600 hover:bg-red-700"
+                                                                    onClick={() => rejectShop(shop._id)}
+                                                                >
+                                                                    <X className="h-4 w-4 mr-1" />
+                                                                    Từ chối
+                                                                </Button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                    
                     <TabsContent value="categories">
                         <Card className="bg-gray-800/50 border-gray-700">
                             <CardHeader>
-                                <CardTitle className="text-white">Danh sách danh mục</CardTitle>
+                                <CardTitle className="text-white">Danh sách loại dịch vụ</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleCategorySave} className="flex gap-2 mb-6">
-                                    <input value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} className="flex-grow p-2 bg-gray-700 rounded" placeholder={editingCategory ? "Chỉnh sửa tên danh mục..." : "Thêm danh mục mới..."} required />
-                                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">{editingCategory ? 'Cập nhật' : 'Thêm'}</Button>
-                                    {editingCategory && <Button type="button" variant="ghost" onClick={() => { setEditingCategory(null); setNewCategoryName(''); }}>Hủy</Button>}
+                                <form onSubmit={handleCategorySave} className="space-y-4 mb-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-sm font-bold text-gray-300 block mb-2">Tên danh mục *</label>
+                                            <input 
+                                                value={newCategoryName} 
+                                                onChange={e => setNewCategoryName(e.target.value)} 
+                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                                placeholder="Nhập tên danh mục" 
+                                                required 
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-bold text-gray-300 block mb-2">Mô tả</label>
+                                            <input 
+                                                value={newCategoryDescription} 
+                                                onChange={e => setNewCategoryDescription(e.target.value)} 
+                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                                placeholder="Nhập mô tả danh mục" 
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                            {editingCategory ? 'Cập nhật' : 'Thêm'}
+                                        </Button>
+                                        {editingCategory && (
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                className="border-gray-600 text-gray-300 hover:bg-gray-700" 
+                                                onClick={() => { 
+                                                    setEditingCategory(null); 
+                                                    setNewCategoryName(''); 
+                                                    setNewCategoryDescription(''); 
+                                                }}
+                                            >
+                                                Hủy
+                                            </Button>
+                                        )}
+                                    </div>
                                 </form>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead className="bg-gray-700">
                                             <tr>
                                                 <th className="p-4">Tên Danh Mục</th>
+                                                <th className="p-4">Mô Tả</th>
                                                 <th className="p-4 text-right">Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {categories.map(cat => (
-                                                <tr key={cat.id} className="border-b border-gray-700">
+                                                <tr key={cat._id} className="border-b border-gray-700">
                                                     <td className="p-4">{cat.name}</td>
+                                                    <td className="p-4 text-gray-300">{cat.description || 'Không có mô tả'}</td>
                                                     <td className="p-4 flex space-x-2 justify-end">
                                                         <Button variant="ghost" size="icon" onClick={() => startEditCategory(cat)}>
                                                             <Edit className="h-5 w-5 text-blue-400" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" onClick={() => deleteCategory(cat.id)}>
+                                                        <Button variant="ghost" size="icon" onClick={() => deleteCategory(cat._id)}>
                                                             <Trash2 className="h-5 w-5 text-red-400" />
                                                         </Button>
                                                     </td>

@@ -22,9 +22,10 @@ export const authService = {
                 password,
             });
             
-            if (response.data.token) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+            if (response.data.data && response.data.data.token) {
+                localStorage.setItem('token', response.data.data.token);
+                const { token, ...user } = response.data.data;
+                localStorage.setItem('user', JSON.stringify(user));
             }
             
             return response.data;
@@ -40,6 +41,16 @@ export const authService = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Registration failed' };
+        }
+    },
+
+    // Register new shop
+    async registerShop(shopData) {
+        try {
+            const response = await api.post('/shops/register', shopData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Shop registration failed' };
         }
     },
 
