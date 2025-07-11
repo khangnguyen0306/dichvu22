@@ -6,7 +6,8 @@ import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { userService, shopService, categoryService } from '@/service';
+import userService from '../service/userService';
+import categoryService from '../service/categoryService';
 
 const AdminDashboard = () => {
     const [editingUser, setEditingUser] = useState(null);
@@ -16,7 +17,6 @@ const AdminDashboard = () => {
     const { toast } = useToast();
     const [users, setUsers] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [pendingShops, setPendingShops] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [filterRole, setFilterRole] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -50,19 +50,6 @@ const AdminDashboard = () => {
         }
     }
 
-    const getPendingShops = async () => {
-        try {
-            setIsLoading(true);
-            const response = await shopService.getPendingShops();
-            console.log(response.data);
-            setPendingShops(response.data);
-        } catch (error) {
-            toast({ title: "Lỗi", description: error.message || "Không thể tải danh sách shop chờ phê duyệt." });
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
     const handleSearch = () => {
         getAllUsers();
 
@@ -76,7 +63,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         getAllUsers();
         getAllCategories();
-        getPendingShops();
     }, []);
 
     useEffect(() => {
