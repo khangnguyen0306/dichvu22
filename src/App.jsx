@@ -17,6 +17,8 @@ import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import AboutUs from '@/pages/AboutUs.jsx';
 import Contact from '@/pages/Contact.jsx';
 import { Toaster } from "@/components/ui/toaster";
+import ShopAdmin from './pages/ShopAdmin';
+import Packages from './pages/Packages';
 
 function App() {
     return (
@@ -35,6 +37,7 @@ function App() {
                             <Route path="contact" element={<Contact />} />
                             <Route path="services" element={<Services />} />
                             <Route path="services/:serviceId" element={<ServiceDetail />} />
+                            <Route path="packages" element={<Packages />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />
@@ -48,6 +51,11 @@ function App() {
                             <Route path="admin" element={
                                 <ProtectedRoute roles={['admin']}>
                                     <AdminDashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="shop-admin" element={
+                                <ProtectedRoute roles={['shop']}>
+                                    <ShopAdmin />
                                 </ProtectedRoute>
                             } />
                         </Route>

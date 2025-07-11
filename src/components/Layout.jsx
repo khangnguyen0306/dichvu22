@@ -36,6 +36,7 @@ const Header = () => {
                     <Link to="/services" className="hover:text-blue-300 transition-colors">Dịch vụ</Link>
                     <Link to="/about" className="hover:text-blue-300 transition-colors">Về chúng tôi</Link>
                     <Link to="/contact" className="hover:text-blue-300 transition-colors">Liên hệ</Link>
+                    <Link to="/packages" className="hover:text-blue-300 transition-colors">Gói dịch vụ</Link>
                 </nav>
                 <div className="flex items-center space-x-4">
                     {user ? (
@@ -47,6 +48,7 @@ const Header = () => {
                                 <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><User className="mr-2 h-4 w-4" />Hồ sơ</Link>
                                 {user.role === 'seller' && <Link to="/dashboard" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><LayoutDashboard className="mr-2 h-4 w-4" />Bảng điều khiển</Link>}
                                 {user.role === 'admin' && <Link to="/admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
+                                {user.role === 'shop' && <Link to="/shop-admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
                                 <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"><LogOut className="mr-2 h-4 w-4" />Đăng xuất</button>
                             </div>
                         </div>
