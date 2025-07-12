@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext.jsx';
-import { serviceService } from '@/service';
+import { serviceService, bookingService, paymentService } from '@/service';
 import { Button } from '@/components/ui/button';
 import { Star, ArrowLeft, MapPin, Phone, User, Calendar, Clock, Loader2, AlertCircle, Package, CheckCircle, XCircle, Info } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { Helmet } from 'react-helmet';
+import { formatCurrency } from '@/utils/textUtils';
 
 const BookingDetail = () => {
     const { serviceId } = useParams();
@@ -153,11 +154,27 @@ const BookingDetail = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Validate form
-        if (!bookingData.customerName || !bookingData.customerPhone || !bookingData.bookingDate) {
+        // Validate all required fields
+        const requiredFields = {
+            customerName: 'Họ tên',
+            customerPhone: 'Số điện thoại',
+            customerEmail: 'Email',
+            bookingDate: 'Ngày đặt lịch',
+            bookingTime: 'Giờ đặt lịch',
+            address: 'Địa chỉ'
+        };
+
+        const missingFields = [];
+        for (const [field, label] of Object.entries(requiredFields)) {
+            if (!bookingData[field] || bookingData[field].trim() === '') {
+                missingFields.push(label);
+            }
+        }
+
+        if (missingFields.length > 0) {
             toast({
-                title: "Thiếu thông tin",
-                description: "Vui lòng điền đầy đủ thông tin bắt buộc.",
+                title: "Thiếu thông tin bắt buộc",
+                description: `Vui lòng điền đầy đủ: ${missingFields.join(', ')}`,
                 variant: "destructive",
             });
             setIsSubmitting(false);
@@ -186,36 +203,54 @@ const BookingDetail = () => {
         }
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const pricing = calculateTotal();
-            const orderData = {
-                id: Date.now(),
-                userId: user._id,
-                userEmail: user.email,
-                service: service,
-                customer: bookingData,
-                pricing: pricing,
-                status: 'pending',
-                createdAt: new Date().toISOString()
+            // Prepare booking data according to API structure
+            const bookingPayload = {
+                serviceId: serviceId,
+                customerName: bookingData.customerName,
+                customerPhone: bookingData.customerPhone,
+                customerEmail: bookingData.customerEmail,
+                serviceType: bookingData.serviceType,
+                address: bookingData.address,
+                bookingDate: bookingData.bookingDate,
+                bookingTime: bookingData.bookingTime,
+                notes: bookingData.notes
             };
 
-            // Save to localStorage for demo
-            const existingOrders = JSON.parse(localStorage.getItem('bookings') || '[]');
-            localStorage.setItem('bookings', JSON.stringify([orderData, ...existingOrders]));
-
+            const bookingRes = await bookingService.createBooking(bookingPayload);
+            
             toast({
                 title: "Đặt lịch thành công!",
-                description: `Đơn đặt lịch #${orderData.id} đã được tạo. Chúng tôi sẽ liên hệ với bạn sớm nhất.`,
+                description: `Đơn đặt lịch đã được tạo thành công. Đang chuyển đến trang thanh toán...`,
             });
 
-            // Redirect to success page or orders page
-            navigate('/profile'); // Assuming there's a profile page to view orders
+            // Call payment API to get payment URL
+            try {
+                const paymentRes = await paymentService.initiatePayment(bookingRes.data._id);
+                
+                if (paymentRes.success && paymentRes.data.paymentUrl) {
+                    // Redirect to payment URL
+                    window.location.href = paymentRes.data.paymentUrl;
+                } else {
+                    // If payment URL creation fails, redirect to profile
+                    toast({
+                        title: "Đặt lịch thành công!",
+                        description: "Đơn đặt lịch đã được tạo. Vui lòng thanh toán sau.",
+                    });
+                    // navigate('/profile?tab=bookings');
+                }
+            } catch (paymentError) {
+                console.error('Payment error:', paymentError);
+                toast({
+                    title: "Đặt lịch thành công!",
+                    description: "Đơn đặt lịch đã được tạo. Vui lòng thanh toán sau.",
+                });
+                navigate('/profile?tab=bookings');
+            }
         } catch (error) {
+            console.error('Booking error:', error);
             toast({
                 title: "Lỗi đặt lịch",
-                description: "Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.",
+                description: error.message || "Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.",
                 variant: "destructive",
             });
         } finally {
@@ -229,7 +264,7 @@ const BookingDetail = () => {
         <>
             <Helmet>
                 <title>Đặt lịch - {service.name} - URGENT</title>
-                <meta name="description" content={`Đặt lịch dịch vụ ${service.name} với giá ${service.price ? service.price.toLocaleString('vi-VN') : 'Liên hệ'} VND`} />
+                <meta name="description" content={`Đặt lịch dịch vụ ${service.name} với giá ${formatCurrency(service.price)}`} />
             </Helmet>
             
             <motion.div
@@ -297,7 +332,7 @@ const BookingDetail = () => {
 
                                 <div>
                                     <label className="block text-sm font-bold text-gray-300 mb-2">
-                                        Email
+                                        Email *
                                     </label>
                                     <input
                                         type="email"
@@ -305,7 +340,8 @@ const BookingDetail = () => {
                                         value={bookingData.customerEmail}
                                         onChange={handleInputChange}
                                         className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
-                                        placeholder="Nhập email (không bắt buộc)"
+                                        placeholder="Nhập email"
+                                        required
                                     />
                                     {user.email && (
                                         <p className="text-xs text-gray-400 mt-1">
@@ -317,7 +353,7 @@ const BookingDetail = () => {
                                 {/* Service Type Selection */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-300 mb-2">
-                                        Loại dịch vụ
+                                        Loại dịch vụ *
                                     </label>
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <label className={`p-4 rounded-lg border-2 cursor-pointer transition ${
@@ -333,6 +369,7 @@ const BookingDetail = () => {
                                                 onChange={handleInputChange}
                                                 className="sr-only"
                                                 disabled={service.serviceType === 'offsite'}
+                                                required
                                             />
                                             <div className="flex items-center">
                                                 <MapPin className="w-5 h-5 mr-2 text-blue-400" />
@@ -355,6 +392,7 @@ const BookingDetail = () => {
                                                 onChange={handleInputChange}
                                                 className="sr-only"
                                                 disabled={service.serviceType === 'onsite'}
+                                                required
                                             />
                                             <div className="flex items-center">
                                                 <MapPin className="w-5 h-5 mr-2 text-red-400" />
@@ -370,7 +408,7 @@ const BookingDetail = () => {
                                 <div>
                                     <label className="block text-sm font-bold text-gray-300 mb-2">
                                         <MapPin className="w-4 h-4 inline mr-2" />
-                                        Địa chỉ {bookingData.serviceType === 'offsite' ? 'thực hiện dịch vụ' : 'studio'} *
+                                        Địa chỉ *
                                     </label>
                                     <textarea
                                         name="address"
@@ -378,10 +416,8 @@ const BookingDetail = () => {
                                         onChange={handleInputChange}
                                         rows="3"
                                         className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
-                                        placeholder={bookingData.serviceType === 'offsite' 
-                                            ? "Nhập địa chỉ chi tiết để thực hiện dịch vụ" 
-                                            : "Nhập địa chỉ studio (nếu có yêu cầu đặc biệt)"}
-                                        required={bookingData.serviceType === 'offsite'}
+                                        placeholder="Nhập địa chỉ chi tiết"
+                                        required
                                     />
                                 </div>
 
@@ -405,7 +441,7 @@ const BookingDetail = () => {
                                     <div>
                                         <label className="block text-sm font-bold text-gray-300 mb-2">
                                             <Clock className="w-4 h-4 inline mr-2" />
-                                            Giờ thực hiện
+                                            Giờ thực hiện *
                                         </label>
                                         <input
                                             type="time"
@@ -413,6 +449,7 @@ const BookingDetail = () => {
                                             value={bookingData.bookingTime}
                                             onChange={handleInputChange}
                                             className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
+                                            required
                                         />
                                     </div>
                                 </div>
@@ -522,7 +559,7 @@ const BookingDetail = () => {
                             <div className="space-y-3">
                                 <div className="flex justify-between text-gray-300">
                                     <span>Giá dịch vụ:</span>
-                                    <span>{service.price ? `${service.price.toLocaleString('vi-VN')} VND` : 'Liên hệ'}</span>
+                                    <span>{formatCurrency(service.price)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-300">
                                     <span>Thời gian:</span>
@@ -530,15 +567,15 @@ const BookingDetail = () => {
                                 </div>
                                 <div className="flex justify-between text-gray-300">
                                     <span>Tạm tính:</span>
-                                    <span>{pricing.subtotal.toLocaleString('vi-VN')} VND</span>
+                                    <span>{formatCurrency(pricing.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-300">
                                     <span>Phí dịch vụ (5%):</span>
-                                    <span>{pricing.serviceFee.toLocaleString('vi-VN')} VND</span>
+                                    <span>{formatCurrency(pricing.serviceFee)}</span>
                                 </div>
                                 <div className="border-t border-gray-600 pt-3 flex justify-between text-xl font-bold text-white">
                                     <span>Tổng cộng:</span>
-                                    <span className="text-blue-400">{pricing.total.toLocaleString('vi-VN')} VND</span>
+                                    <span className="text-blue-400">{formatCurrency(pricing.total)}</span>
                                 </div>
                             </div>
 

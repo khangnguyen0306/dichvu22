@@ -11,6 +11,7 @@ import ForgotPassword from '@/pages/ForgotPassword.jsx';
 import Services from '@/pages/Services.jsx';
 import ServiceDetail from '@/pages/ServiceDetail.jsx';
 import BookingDetail from '@/pages/BookingDetail.jsx';
+import BookingPaymentSuccess from '@/pages/BookingPaymentSuccess.jsx';
 import Dashboard from '@/pages/Dashboard.jsx';
 import Profile from '@/pages/Profile.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
@@ -20,6 +21,7 @@ import AboutUs from '@/pages/AboutUs.jsx';
 import Contact from '@/pages/Contact.jsx';
 import { Toaster } from "@/components/ui/toaster";
 import ShopAdmin from './pages/ShopAdmin';
+import ShopBookingManagement from './pages/ShopBookingManagement';
 import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
 import ShopDetail from './pages/ShopDetail';
@@ -45,6 +47,7 @@ function App() {
                             <Route path="packages" element={<Packages />} />
                             <Route path="payment-success" element={<PaymentSuccess />} />
                             <Route path="shop/:shopId" element={<ShopDetail />} />
+                            <Route path="booking-payment-success" element={<BookingPaymentSuccess />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />
@@ -70,7 +73,11 @@ function App() {
                                     <ShopAdmin />
                                 </ProtectedRoute>
                             } />
-
+                            <Route path="shop-booking-management" element={
+                                <ProtectedRoute roles={['shop']}>
+                                    <ShopBookingManagement />
+                                </ProtectedRoute>
+                            } />
                         </Route>
                     </Routes>
                 </Router>

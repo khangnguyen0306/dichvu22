@@ -1,222 +1,98 @@
 import { api, handleApiError } from './apiConfig';
 
-// Booking Service
 export const bookingService = {
-    // Get all bookings (with pagination and filters)
-    async getBookings(params = {}) {
-        try {
-            const response = await api.get('/bookings', { params });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Get booking by ID
-    async getBookingById(id) {
-        try {
-            const response = await api.get(`/bookings/${id}`);
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Create new booking
-    async createBooking(bookingData) {
+    // Create a new booking
+    createBooking: async (bookingData) => {
         try {
             const response = await api.post('/bookings', bookingData);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể tạo đơn đặt lịch');
         }
     },
 
-    // Update booking
-    async updateBooking(id, bookingData) {
+    // Get user's bookings with filters
+    getUserBookings: async (customerEmail, params = {}) => {
         try {
-            const response = await api.put(`/bookings/${id}`, bookingData);
+            const { status, paymentStatus, search, page = 1, limit = 10 } = params;
+            const queryParams = new URLSearchParams();
+            
+            if (status) queryParams.append('status', status);
+            if (paymentStatus) queryParams.append('paymentStatus', paymentStatus);
+            if (search) queryParams.append('search', search);
+            if (page) queryParams.append('page', page);
+            if (limit) queryParams.append('limit', limit);
+            
+            const queryString = queryParams.toString();
+            const url = `/bookings/customer/${encodeURIComponent(customerEmail)}${queryString ? `?${queryString}` : ''}`;
+            
+            const response = await api.get(url);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể tải danh sách đặt lịch');
         }
     },
 
-    // Delete booking
-    async deleteBooking(id) {
+    // Get booking by ID
+    getBookingById: async (bookingId) => {
         try {
-            const response = await api.delete(`/bookings/${id}`);
+            const response = await api.get(`/bookings/${bookingId}`);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể tải thông tin đặt lịch');
         }
     },
 
     // Cancel booking
-    async cancelBooking(id, reason = '') {
+    cancelBooking: async (bookingId) => {
         try {
-            const response = await api.post(`/bookings/${id}/cancel`, { reason });
+            const response = await api.put(`/bookings/${bookingId}/cancel`);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể hủy đặt lịch');
         }
     },
 
-    // Confirm booking
-    async confirmBooking(id) {
+    // Update booking
+    updateBooking: async (bookingId, updateData) => {
         try {
-            const response = await api.post(`/bookings/${id}/confirm`);
+            const response = await api.put(`/bookings/${bookingId}`, updateData);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể cập nhật đặt lịch');
         }
     },
 
-    // Complete booking
-    async completeBooking(id, notes = '') {
+    // Get shop bookings with filters
+    getShopBookings: async (shopId, params = {}) => {
         try {
-            const response = await api.post(`/bookings/${id}/complete`, { notes });
+            const { status, paymentStatus, search, page = 1, limit = 10 } = params;
+            const queryParams = new URLSearchParams();
+            
+            queryParams.append('shopId', shopId);
+            if (status) queryParams.append('status', status);
+            if (paymentStatus) queryParams.append('paymentStatus', paymentStatus);
+            if (search) queryParams.append('search', search);
+            if (page) queryParams.append('page', page);
+            if (limit) queryParams.append('limit', limit);
+            
+            const queryString = queryParams.toString();
+            const url = `/bookings${queryString ? `?${queryString}` : ''}`;
+            
+            const response = await api.get(url);
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể tải danh sách đặt lịch của shop');
         }
     },
 
-    // Get user's bookings
-    async getUserBookings(params = {}) {
+    // Update booking status (accept/reject)
+    updateBookingStatus: async (bookingId, status) => {
         try {
-            const response = await api.get('/user/bookings', { params });
+            const response = await api.put(`/bookings/${bookingId}`, { status });
             return response.data;
         } catch (error) {
-            throw handleApiError(error);
+            throw new Error(error.response?.data?.message || 'Không thể cập nhật trạng thái đặt lịch');
         }
-    },
-
-    // Get seller's bookings
-    async getSellerBookings(params = {}) {
-        try {
-            const response = await api.get('/seller/bookings', { params });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Get available time slots
-    async getAvailableTimeSlots(serviceId, date) {
-        try {
-            const response = await api.get('/bookings/available-slots', {
-                params: { serviceId, date }
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Check booking availability
-    async checkAvailability(serviceId, date, time) {
-        try {
-            const response = await api.post('/bookings/check-availability', {
-                serviceId,
-                date,
-                time
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Reschedule booking
-    async rescheduleBooking(id, newDate, newTime) {
-        try {
-            const response = await api.post(`/bookings/${id}/reschedule`, {
-                newDate,
-                newTime
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Add booking notes
-    async addBookingNotes(id, notes) {
-        try {
-            const response = await api.post(`/bookings/${id}/notes`, { notes });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Get booking history
-    async getBookingHistory(userId, params = {}) {
-        try {
-            const response = await api.get(`/bookings/history/${userId}`, { params });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Get booking statistics
-    async getBookingStatistics(period = 'month') {
-        try {
-            const response = await api.get('/bookings/statistics', {
-                params: { period }
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Export bookings
-    async exportBookings(format = 'csv', filters = {}) {
-        try {
-            const response = await api.get('/bookings/export', {
-                params: { format, ...filters },
-                responseType: 'blob'
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Send booking reminder
-    async sendBookingReminder(bookingId) {
-        try {
-            const response = await api.post(`/bookings/${bookingId}/reminder`);
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Get booking calendar
-    async getBookingCalendar(year, month) {
-        try {
-            const response = await api.get('/bookings/calendar', {
-                params: { year, month }
-            });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-
-    // Bulk update bookings
-    async bulkUpdateBookings(updates) {
-        try {
-            const response = await api.post('/bookings/bulk-update', { updates });
-            return response.data;
-        } catch (error) {
-            throw handleApiError(error);
-        }
-    },
-};
-
-export default bookingService; 
+    }
+}; 

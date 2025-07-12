@@ -6,6 +6,7 @@ import { serviceService, categoryService } from '@/service';
 import { Star, Search, Loader2, AlertCircle, Clock, MapPin } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { useToast } from "@/components/ui/use-toast";
+import { truncateText } from '@/utils/textUtils';
 
 const ServiceCard = ({ service }) => (
     <motion.div
@@ -42,8 +43,8 @@ const ServiceCard = ({ service }) => (
                     {service.rating || 0} ({service.reviews ? service.reviews.length : 0} đánh giá)
                 </span>
             </div>
-            <p className="text-gray-400 text-sm mb-2">
-                {service.description}
+            <p className="text-gray-400 text-sm mb-2" title={service.description}>
+                {truncateText(service.description, 80)}
             </p>
             <div className="flex items-center text-gray-400 text-sm mb-2">
                 <Clock className="w-4 h-4 mr-1" />
