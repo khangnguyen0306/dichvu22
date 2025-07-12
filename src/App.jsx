@@ -21,6 +21,7 @@ import AboutUs from '@/pages/AboutUs.jsx';
 import Contact from '@/pages/Contact.jsx';
 import { Toaster } from "@/components/ui/toaster";
 import ShopAdmin from './pages/ShopAdmin';
+import ShopBookingManagement from './pages/ShopBookingManagement';
 import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
 
@@ -68,6 +69,11 @@ function App() {
                             <Route path="shop-admin" element={
                                 <ProtectedRoute roles={['shop']}>
                                     <ShopAdmin />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="shop-booking-management" element={
+                                <ProtectedRoute roles={['shop']}>
+                                    <ShopBookingManagement />
                                 </ProtectedRoute>
                             } />
                         </Route>

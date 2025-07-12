@@ -61,5 +61,38 @@ export const bookingService = {
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Không thể cập nhật đặt lịch');
         }
+    },
+
+    // Get shop bookings with filters
+    getShopBookings: async (shopId, params = {}) => {
+        try {
+            const { status, paymentStatus, search, page = 1, limit = 10 } = params;
+            const queryParams = new URLSearchParams();
+            
+            queryParams.append('shopId', shopId);
+            if (status) queryParams.append('status', status);
+            if (paymentStatus) queryParams.append('paymentStatus', paymentStatus);
+            if (search) queryParams.append('search', search);
+            if (page) queryParams.append('page', page);
+            if (limit) queryParams.append('limit', limit);
+            
+            const queryString = queryParams.toString();
+            const url = `/bookings${queryString ? `?${queryString}` : ''}`;
+            
+            const response = await api.get(url);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Không thể tải danh sách đặt lịch của shop');
+        }
+    },
+
+    // Update booking status (accept/reject)
+    updateBookingStatus: async (bookingId, status) => {
+        try {
+            const response = await api.put(`/bookings/${bookingId}`, { status });
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Không thể cập nhật trạng thái đặt lịch');
+        }
     }
 }; 

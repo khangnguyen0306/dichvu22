@@ -53,6 +53,7 @@ const Header = () => {
                                 {user.role === 'admin' && <Link to="/admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
                                 {user.role === 'admin' && <Link to="/admin/statistics" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><BarChart3 className="mr-2 h-4 w-4" />Thống kê</Link>}
                                 {user.role === 'shop' && <Link to="/shop-admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
+                                {user.role === 'shop' && <Link to="/shop-booking-management" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><BarChart3 className="mr-2 h-4 w-4" />Quản lý đặt lịch</Link>}
                                 <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"><LogOut className="mr-2 h-4 w-4" />Đăng xuất</button>
                             </div>
                         </div>
