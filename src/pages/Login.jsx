@@ -61,8 +61,8 @@ const Login = () => {
     return (
         <>
             <Helmet>
-                <title>Đăng Nhập - DịchVụPro</title>
-                <meta name="description" content="Đăng nhập vào tài khoản DịchVụPro của bạn để quản lý dịch vụ và đơn hàng." />
+                <title>Đăng Nhập - URGENT</title>
+                <meta name="description" content="Đăng nhập vào tài khoản URGENT của bạn để quản lý dịch vụ và đơn hàng." />
             </Helmet>
             <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                 <motion.div

@@ -228,7 +228,7 @@ const BookingDetail = () => {
     return (
         <>
             <Helmet>
-                <title>Đặt lịch - {service.name} - DịchVụPro</title>
+                <title>Đặt lịch - {service.name} - URGENT</title>
                 <meta name="description" content={`Đặt lịch dịch vụ ${service.name} với giá ${service.price ? service.price.toLocaleString('vi-VN') : 'Liên hệ'} VND`} />
             </Helmet>
             

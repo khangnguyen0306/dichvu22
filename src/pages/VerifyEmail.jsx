@@ -49,8 +49,8 @@ const VerifyEmail = () => {
     return (
         <>
             <Helmet>
-                <title>Xác Thực Email - DịchVụPro</title>
-                <meta name="description" content="Xác thực email tài khoản DịchVụPro của bạn." />
+                <title>Xác Thực Email - URGENT</title>
+                <meta name="description" content="Xác thực email tài khoản URGENT của bạn." />
             </Helmet>
             <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                 <motion.div

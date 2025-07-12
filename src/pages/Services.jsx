@@ -191,8 +191,8 @@ const Services = () => {
     return (
         <>
             <Helmet>
-                <title>Duyệt Dịch Vụ - DịchVụPro</title>
-                <meta name="description" content="Tìm kiếm, lọc và khám phá hàng ngàn dịch vụ chất lượng trên DịchVụPro." />
+                <title>Duyệt Dịch Vụ - URGENT</title>
+                <meta name="description" content="Tìm kiếm, lọc và khám phá hàng ngàn dịch vụ chất lượng trên URGENT." />
             </Helmet>
             <div className="space-y-8">
                 <div className="bg-gray-800 p-6 rounded-lg shadow-md">

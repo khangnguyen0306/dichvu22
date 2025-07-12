@@ -21,8 +21,8 @@ import React, { useState } from 'react';
         return (
             <>
                 <Helmet>
-                    <title>Quên Mật Khẩu - DịchVụPro</title>
-                    <meta name="description" content="Đặt lại mật khẩu cho tài khoản DịchVụPro của bạn." />
+                    <title>Quên Mật Khẩu - URGENT</title>
+                    <meta name="description" content="Đặt lại mật khẩu cho tài khoản URGENT của bạn." />
                 </Helmet>
                 <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                     <motion.div

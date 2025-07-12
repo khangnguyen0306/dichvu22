@@ -31,8 +31,8 @@ const Profile = () => {
     return (
         <>
             <Helmet>
-                <title>Hồ Sơ Của Tôi - DịchVụPro</title>
-                <meta name="description" content="Xem và chỉnh sửa thông tin hồ sơ cá nhân của bạn trên DịchVụPro." />
+                <title>Hồ Sơ Của Tôi - URGENT</title>
+                <meta name="description" content="Xem và chỉnh sửa thông tin hồ sơ cá nhân của bạn trên URGENT." />
             </Helmet>
             <div className="max-w-4xl mx-auto space-y-8">
                 <h1 className="text-4xl font-bold text-blue-400">Hồ Sơ Của Tôi</h1>

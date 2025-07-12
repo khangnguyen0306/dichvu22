@@ -103,7 +103,7 @@ const ServiceDetail = () => {
     return (
         <>
             <Helmet>
-                <title>{service.name} - DịchVụPro</title>
+                <title>{service.name} - URGENT</title>
                 <meta name="description" content={service.description.substring(0, 160)} />
             </Helmet>
             <motion.div

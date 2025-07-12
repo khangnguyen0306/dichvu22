@@ -116,8 +116,8 @@ const Register = () => {
     return (
         <>
             <Helmet>
-                <title>Đăng Ký - DịchVụPro</title>
-                <meta name="description" content="Tạo tài khoản DịchVụPro mới để bắt đầu mua và bán dịch vụ." />
+                <title>Đăng Ký - URGENT</title>
+                <meta name="description" content="Tạo tài khoản URGENT mới để bắt đầu mua và bán dịch vụ." />
             </Helmet>
             <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                 <motion.div

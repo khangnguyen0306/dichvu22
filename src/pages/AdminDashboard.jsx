@@ -192,7 +192,7 @@ const AdminDashboard = () => {
     return (
         <>
             <Helmet>
-                <title>Bảng Điều Khiển Quản Trị - DịchVụPro</title>
+                <title>Bảng Điều Khiển Quản Trị - URGENT</title>
                 <meta name="description" content="Quản lý người dùng và danh mục dịch vụ trên toàn bộ nền tảng." />
             </Helmet>
             <div className="space-y-8">

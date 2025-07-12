@@ -7,3 +7,4 @@ export { shopService } from './shopService';
 export { bookingService } from './bookingService';
 export { productTypeService } from './productTypeService';
 export { serviceService } from './serviceService'; 
+export { dashboardService } from './dashboardService';

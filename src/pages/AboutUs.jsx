@@ -13,8 +13,8 @@ const AboutUs = () => {
   return (
     <>
       <Helmet>
-        <title>Về Chúng Tôi - DịchVụPro</title>
-        <meta name="description" content="Tìm hiểu về sứ mệnh, tầm nhìn và đội ngũ đằng sau DịchVụPro, nền tảng kết nối dịch vụ hàng đầu." />
+        <title>Về Chúng Tôi - URGENT</title>
+        <meta name="description" content="Tìm hiểu về sứ mệnh, tầm nhìn và đội ngũ đằng sau URGENT, nền tảng kết nối dịch vụ hàng đầu." />
       </Helmet>
       <div className="space-y-16">
         <motion.section
@@ -24,10 +24,10 @@ const AboutUs = () => {
           className="text-center py-16 px-4 bg-gradient-to-b from-blue-900/30 to-gray-900 rounded-lg"
         >
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-            Về <span className="text-blue-400">DịchVụPro</span>
+            Về <span className="text-blue-400">URGENT</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Chúng tôi đang xây dựng cầu nối giữa các chuyên gia tài năng và những khách hàng cần dịch vụ chất lượng cao, tạo ra một cộng đồng đáng tin cậy và hiệu quả.
+            Chúng tôi là nền tảng kết nối dịch vụ hàng đầu, giúp mọi người dễ dàng tìm kiếm và sử dụng các dịch vụ chất lượng.
           </p>
         </motion.section>
 
@@ -35,7 +35,7 @@ const AboutUs = () => {
           <div>
             <h2 className="text-4xl font-bold mb-6">Câu Chuyện Của Chúng Tôi</h2>
             <p className="text-gray-300 leading-relaxed mb-4">
-              DịchVụPro được thành lập vào năm 2025 với một mục tiêu đơn giản: làm cho việc tìm kiếm và cung cấp dịch vụ trở nên dễ dàng, minh bạch và an toàn hơn cho tất cả mọi người. Chúng tôi nhận thấy có một khoảng cách lớn giữa các freelancer, chuyên gia tài năng và những khách hàng đang tìm kiếm họ.
+              URGENT được thành lập vào năm 2025 với một mục tiêu đơn giản: làm cho việc tìm kiếm và cung cấp dịch vụ trở nên dễ dàng, minh bạch và an toàn hơn cho tất cả mọi người. Chúng tôi nhận thấy có một khoảng trống lớn trong thị trường dịch vụ trực tuyến tại Việt Nam - nơi mà người dùng thường gặp khó khăn trong việc tìm kiếm dịch vụ đáng tin cậy và các nhà cung cấp dịch vụ gặp thách thức trong việc tiếp cận khách hàng tiềm năng.
             </p>
             <p className="text-gray-300 leading-relaxed">
               Nền tảng của chúng tôi được thiết kế để giải quyết vấn đề đó. Bằng cách cung cấp các công cụ mạnh mẽ, một hệ thống đánh giá đáng tin cậy và quy trình làm việc liền mạch, chúng tôi trao quyền cho cả người bán và người mua để đạt được mục tiêu của họ.

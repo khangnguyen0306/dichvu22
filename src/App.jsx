@@ -14,6 +14,7 @@ import BookingDetail from '@/pages/BookingDetail.jsx';
 import Dashboard from '@/pages/Dashboard.jsx';
 import Profile from '@/pages/Profile.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
+import AdminStatistics from '@/pages/AdminStatistics.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import AboutUs from '@/pages/AboutUs.jsx';
 import Contact from '@/pages/Contact.jsx';
@@ -53,6 +54,11 @@ function App() {
                             <Route path="admin" element={
                                 <ProtectedRoute roles={['admin']}>
                                     <AdminDashboard />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="admin/statistics" element={
+                                <ProtectedRoute roles={['admin']}>
+                                    <AdminStatistics />
                                 </ProtectedRoute>
                             } />
                             <Route path="shop-admin" element={

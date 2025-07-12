@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext.jsx';
-import { LogOut, User, LayoutDashboard, Shield } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, Shield, BarChart3 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const Header = () => {
@@ -30,7 +30,7 @@ const Header = () => {
         >
             <div className="container mx-auto flex justify-between items-center">
                 <Link to="/" className="text-2xl font-bold text-blue-400 hover:text-blue-300 transition-colors">
-                    DịchVụPro
+                    URGENT
                 </Link>
                 <nav className="hidden md:flex items-center space-x-6">
                     <Link to="/" className="hover:text-blue-300 transition-colors">Trang chủ</Link>
@@ -51,6 +51,7 @@ const Header = () => {
                                 <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><User className="mr-2 h-4 w-4" />Hồ sơ</Link>
                                 {user.role === 'seller' && <Link to="/dashboard" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><LayoutDashboard className="mr-2 h-4 w-4" />Bảng điều khiển</Link>}
                                 {user.role === 'admin' && <Link to="/admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
+                                {user.role === 'admin' && <Link to="/admin/statistics" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><BarChart3 className="mr-2 h-4 w-4" />Thống kê</Link>}
                                 {user.role === 'shop' && <Link to="/shop-admin" className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"><Shield className="mr-2 h-4 w-4" />Quản trị</Link>}
                                 <button onClick={handleLogout} className="flex items-center w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"><LogOut className="mr-2 h-4 w-4" />Đăng xuất</button>
                             </div>
@@ -75,8 +76,10 @@ const Footer = () => (
     <footer className="bg-gray-900 text-white p-8 mt-auto">
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-                <p className="font-bold text-xl text-blue-400 mb-2">DịchVụPro</p>
-                <p className="text-gray-400">Nền tảng kết nối các chuyên gia cung cấp dịch vụ với khách hàng.</p>
+                <p className="font-bold text-xl text-blue-400 mb-2">URGENT</p>
+                <p className="text-gray-400">
+                    Nền tảng kết nối dịch vụ hàng đầu, giúp bạn dễ dàng tìm kiếm và sử dụng các dịch vụ chất lượng.
+                </p>
             </div>
             <div>
                 <p className="font-bold mb-2">Khám phá</p>
@@ -102,7 +105,7 @@ const Footer = () => (
             </div>
         </div>
         <div className="text-center text-gray-500 mt-8 pt-8 border-t border-gray-800">
-            <p>&copy; 2025 DịchVụPro. Mọi quyền được bảo lưu.</p>
+            <p>&copy; 2025 URGENT. Mọi quyền được bảo lưu.</p>
         </div>
     </footer>
 );

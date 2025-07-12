@@ -170,8 +170,8 @@ const Home = () => {
     return (
         <>
             <Helmet>
-                <title>Trang Chủ - DịchVụPro</title>
-                <meta name="description" content="Khám phá và đặt lịch các dịch vụ chất lượng cao từ các chuyên gia uy tín. DịchVụPro là nền tảng kết nối dịch vụ tốt nhất." />
+                <title>Trang Chủ - URGENT</title>
+                <meta name="description" content="Khám phá và đặt lịch các dịch vụ chất lượng cao từ các chuyên gia uy tín. URGENT là nền tảng kết nối dịch vụ tốt nhất." />
             </Helmet>
             <div className="space-y-20">
                 {/* Hero Section */}
@@ -227,7 +227,7 @@ const Home = () => {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-12"
                     >
-                        <h2 className="text-4xl font-bold text-white mb-4">Tại Sao Chọn DịchVụPro?</h2>
+                        <h2 className="text-4xl font-bold text-white mb-4">Tại Sao Chọn URGENT?</h2>
                         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
                             Chúng tôi cam kết mang đến những dịch vụ chất lượng nhất với trải nghiệm tuyệt vời
                         </p>

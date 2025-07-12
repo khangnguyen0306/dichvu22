@@ -22,8 +22,8 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Liên Hệ - DịchVụPro</title>
-        <meta name="description" content="Liên hệ với DịchVụPro để được hỗ trợ, giải đáp thắc mắc hoặc hợp tác." />
+        <title>Liên Hệ - URGENT</title>
+        <meta name="description" content="Liên hệ với URGENT để được hỗ trợ, giải đáp thắc mắc hoặc hợp tác." />
       </Helmet>
       <div className="space-y-16">
         <motion.section

@@ -1,6 +1,6 @@
-# Service Layer Documentation
+# Service Layer
 
-This directory contains all the API service modules for the DịchVụPro application. Each service is responsible for handling specific API endpoints and business logic.
+This directory contains all the API service modules for the URGENT application. Each service is responsible for handling specific API endpoints and business logic.
 
 ## Services Overview
 

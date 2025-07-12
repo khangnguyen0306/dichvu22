@@ -65,7 +65,7 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>Bảng Điều Khiển - DịchVụPro</title>
+        <title>Bảng Điều Khiển - URGENT</title>
         <meta name="description" content="Quản lý dịch vụ, xem thống kê và theo dõi hiệu suất cửa hàng của bạn." />
       </Helmet>
       <div className="space-y-8">
