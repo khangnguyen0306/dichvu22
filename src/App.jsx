@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DataProvider } from '@/contexts/DataContext.jsx';
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import Layout from '@/components/Layout.jsx';
@@ -34,6 +34,11 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/verify-email/:token" element={<VerifyEmail />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
+                        
+                        {/* Redirect for double slash issue */}
+                        <Route path="//booking-payment-success" element={
+                            <Navigate to="/booking-payment-success" replace />
+                        } />
                         
                         <Route path="/" element={<Layout />}>
                             <Route index element={<Home />} />
