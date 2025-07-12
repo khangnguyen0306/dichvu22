@@ -19,52 +19,80 @@ const BookingPaymentSuccess = () => {
         
         // Get URL parameters
         const bookingId = searchParams.get('bookingId');
+        const success = searchParams.get('success');
         const code = searchParams.get('code');
         const status = searchParams.get('status');
         const cancel = searchParams.get('cancel');
         const orderCode = searchParams.get('orderCode');
         const id = searchParams.get('id');
 
+        console.log('URL Parameters:', {
+          bookingId,
+          success,
+          code,
+          status,
+          cancel,
+          orderCode,
+          id
+        });
+
         // Validate required parameters
-        if (!bookingId || !code || !status) {
+        if (!bookingId) {
           setStatus('failed');
           toast({
             title: "Lỗi tham số",
-            description: "Thiếu thông tin cần thiết để xử lý thanh toán.",
+            description: "Thiếu bookingId để xử lý thanh toán.",
             variant: "destructive",
           });
           return;
         }
 
-        // Call payment return API
-        const response = await paymentService.handlePaymentReturn(code, status, bookingId);
+        // Handle different payment response formats
+        let paymentSuccess = false;
         
-        // Check payment status based on PayOS response
-        if (code === '00' && status === 'PAID' && cancel === 'false') {
+        // Check if we have the success parameter
+        if (success === 'true') {
+          paymentSuccess = true;
+        }
+        // Check PayOS format
+        else if (code === '00' && status === 'PAID' && cancel === 'false') {
+          paymentSuccess = true;
+        }
+        // Check other success indicators
+        else if (code === '00' && status === 'PAID') {
+          paymentSuccess = true;
+        }
+
+        // Call payment return API if we have the required parameters
+        if (code && status) {
+          try {
+            const response = await paymentService.handlePaymentReturn(code, status, bookingId);
+            console.log('Payment API Response:', response);
+          } catch (apiError) {
+            console.error('Payment API Error:', apiError);
+            // Continue with UI processing even if API fails
+          }
+        }
+
+        // Set status based on payment success
+        if (paymentSuccess) {
           setStatus('success');
           toast({
             title: "Thanh toán thành công!",
             description: "Đơn đặt lịch của bạn đã được thanh toán thành công.",
           });
-        } else if (code === '00' && status === 'PAID' && cancel === 'true') {
+        } else if (cancel === 'true') {
           setStatus('cancelled');
           toast({
             title: "Thanh toán bị hủy",
             description: "Bạn đã hủy thanh toán. Đơn đặt lịch vẫn được giữ lại.",
             variant: "destructive",
           });
-        } else if (code !== '00' || status !== 'PAID') {
+        } else {
           setStatus('failed');
           toast({
             title: "Thanh toán thất bại",
             description: "Có lỗi xảy ra trong quá trình thanh toán.",
-            variant: "destructive",
-          });
-        } else {
-          setStatus('unknown');
-          toast({
-            title: "Trạng thái không xác định",
-            description: "Không thể xác định kết quả thanh toán.",
             variant: "destructive",
           });
         }

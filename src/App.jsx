@@ -70,7 +70,6 @@ function App() {
                                     <ShopAdmin />
                                 </ProtectedRoute>
                             } />
-
                         </Route>
                     </Routes>
                 </Router>
