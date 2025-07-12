@@ -21,6 +21,7 @@ import Contact from '@/pages/Contact.jsx';
 import { Toaster } from "@/components/ui/toaster";
 import ShopAdmin from './pages/ShopAdmin';
 import Packages from './pages/Packages';
+import PaymentSuccess from './pages/PaymentSuccess';
 
 function App() {
     return (
@@ -41,6 +42,7 @@ function App() {
                             <Route path="services/:serviceId" element={<ServiceDetail />} />
                             <Route path="booking/:serviceId" element={<BookingDetail />} />
                             <Route path="packages" element={<Packages />} />
+                            <Route path="payment-success" element={<PaymentSuccess />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />
@@ -66,6 +68,7 @@ function App() {
                                     <ShopAdmin />
                                 </ProtectedRoute>
                             } />
+
                         </Route>
                     </Routes>
                 </Router>
