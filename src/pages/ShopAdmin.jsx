@@ -6,8 +6,9 @@ import { toast } from '../components/ui/use-toast';
 import { ChevronDown, X } from 'lucide-react';
 import serviceService from '../service/serviceService';
 import categoryService from '../service/categoryService';
-
+import { useAuth } from '@/contexts/AuthContext.jsx';
 const ShopAdmin = () => {
+  const {user}=useAuth();
   const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({ 
@@ -40,6 +41,7 @@ const ShopAdmin = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   
+
   // New state for managing lists
   const [newRequirement, setNewRequirement] = useState('');
   const [newInclude, setNewInclude] = useState('');
@@ -49,7 +51,7 @@ const ShopAdmin = () => {
   const fetchServices = async () => {
     setLoading(true);
     try {
-      const res = await serviceService.getServices();
+      const res = await serviceService.getServicesByShop(user?.shopId);
       setServices(res.data || []);
     } catch (error) {
       toast({ title: 'Lỗi', description: error.message || 'Không thể tải dịch vụ.' });

@@ -11,6 +11,7 @@ import ForgotPassword from '@/pages/ForgotPassword.jsx';
 import Services from '@/pages/Services.jsx';
 import ServiceDetail from '@/pages/ServiceDetail.jsx';
 import BookingDetail from '@/pages/BookingDetail.jsx';
+import BookingPaymentSuccess from '@/pages/BookingPaymentSuccess.jsx';
 import Dashboard from '@/pages/Dashboard.jsx';
 import Profile from '@/pages/Profile.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
@@ -43,6 +44,7 @@ function App() {
                             <Route path="booking/:serviceId" element={<BookingDetail />} />
                             <Route path="packages" element={<Packages />} />
                             <Route path="payment-success" element={<PaymentSuccess />} />
+                            <Route path="booking-payment-success" element={<BookingPaymentSuccess />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />

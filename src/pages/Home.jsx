@@ -6,6 +6,7 @@ import { serviceService, categoryService } from '@/service';
 import { ArrowRight, Star, Loader2, AlertCircle, Clock, MapPin, CheckCircle, Users, Award, Shield, Zap } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { useToast } from "@/components/ui/use-toast";
+import { truncateText } from '@/utils/textUtils';
 
 const ServiceCard = ({ service, index }) => (
     <motion.div
@@ -53,8 +54,8 @@ const ServiceCard = ({ service, index }) => (
                 </div>
             </div>
             <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">{service.name}</h3>
-            <p className="text-gray-400 mb-4 flex-grow text-sm leading-relaxed">
-                {service.description.substring(0, 80)}...
+            <p className="text-gray-400 mb-4 flex-grow text-sm leading-relaxed" title={service.description}>
+                {truncateText(service.description, 80)}
             </p>
             <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
                 <div className="flex items-center">
@@ -321,8 +322,8 @@ const Home = () => {
                                                 <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
                                             </div>
                                             {category.description && (
-                                                <p className="text-gray-400 text-sm leading-relaxed">
-                                                    {category.description.substring(0, 80)}...
+                                                <p className="text-gray-400 text-sm leading-relaxed" title={category.description}>
+                                                    {truncateText(category.description, 80)}
                                                 </p>
                                             )}
                                             <div className="mt-4 flex items-center text-sm text-gray-400">
