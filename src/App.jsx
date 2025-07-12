@@ -24,6 +24,7 @@ import ShopAdmin from './pages/ShopAdmin';
 import ShopBookingManagement from './pages/ShopBookingManagement';
 import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
+import ShopDetail from './pages/ShopDetail';
 
 function App() {
     return (
@@ -45,6 +46,7 @@ function App() {
                             <Route path="booking/:serviceId" element={<BookingDetail />} />
                             <Route path="packages" element={<Packages />} />
                             <Route path="payment-success" element={<PaymentSuccess />} />
+                            <Route path="shop/:shopId" element={<ShopDetail />} />
                             <Route path="booking-payment-success" element={<BookingPaymentSuccess />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
