@@ -10,6 +10,7 @@ import VerifyEmail from '@/pages/VerifyEmail.jsx';
 import ForgotPassword from '@/pages/ForgotPassword.jsx';
 import Services from '@/pages/Services.jsx';
 import ServiceDetail from '@/pages/ServiceDetail.jsx';
+import BookingDetail from '@/pages/BookingDetail.jsx';
 import Dashboard from '@/pages/Dashboard.jsx';
 import Profile from '@/pages/Profile.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
@@ -37,6 +38,7 @@ function App() {
                             <Route path="contact" element={<Contact />} />
                             <Route path="services" element={<Services />} />
                             <Route path="services/:serviceId" element={<ServiceDetail />} />
+                            <Route path="booking/:serviceId" element={<BookingDetail />} />
                             <Route path="packages" element={<Packages />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>

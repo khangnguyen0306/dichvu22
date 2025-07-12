@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Header = () => {
     const { user, logout } = useAuth();
+    console.log(user)
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -36,7 +37,9 @@ const Header = () => {
                     <Link to="/services" className="hover:text-blue-300 transition-colors">Dịch vụ</Link>
                     <Link to="/about" className="hover:text-blue-300 transition-colors">Về chúng tôi</Link>
                     <Link to="/contact" className="hover:text-blue-300 transition-colors">Liên hệ</Link>
-                    <Link to="/packages" className="hover:text-blue-300 transition-colors">Gói dịch vụ</Link>
+                    {user?.role === 'shop' && (
+                        <Link to="/packages" className="hover:text-blue-300 transition-colors">Gói dịch vụ</Link>
+                   )}
                 </nav>
                 <div className="flex items-center space-x-4">
                     {user ? (

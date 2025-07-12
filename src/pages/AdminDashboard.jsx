@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import userService from '../service/userService';
 import categoryService from '../service/categoryService';
+import shopService from '../service/shopService';
 
 const AdminDashboard = () => {
     const [editingUser, setEditingUser] = useState(null);
@@ -17,6 +18,7 @@ const AdminDashboard = () => {
     const { toast } = useToast();
     const [users, setUsers] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [pendingShops, setPendingShops] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [filterRole, setFilterRole] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -50,9 +52,20 @@ const AdminDashboard = () => {
         }
     }
 
+    const getPendingShops = async () => {
+        try {
+            setIsLoading(true);
+            const response = await shopService.getPendingShops();
+            setPendingShops(response.data || []);
+        } catch (error) {
+            toast({ title: "Lỗi", description: error.message || "Không thể tải danh sách shop chờ phê duyệt." });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const handleSearch = () => {
         getAllUsers();
-
     };
 
     const handleResetFilter = () => {
@@ -63,6 +76,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         getAllUsers();
         getAllCategories();
+        getPendingShops();
     }, []);
 
     useEffect(() => {
@@ -90,8 +104,6 @@ const AdminDashboard = () => {
         try {
             await shopService.approveShop(shopId);
             
-            
-            
             toast({ 
                 title: "Thành công", 
                 description: "Shop đã được phê duyệt thành công." 
@@ -111,7 +123,6 @@ const AdminDashboard = () => {
         try {
             await shopService.rejectShop(shopId, reason);
         
-            
             toast({ 
                 title: "Thành công", 
                 description: "Shop đã bị từ chối." 
@@ -291,7 +302,12 @@ const AdminDashboard = () => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {pendingShops.length === 0 ? (
+                                {isLoading ? (
+                                    <div className="text-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+                                        <p className="text-gray-400 mt-2">Đang tải danh sách shop...</p>
+                                    </div>
+                                ) : pendingShops.length === 0 ? (
                                     <div className="text-center py-8">
                                         <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                                         <p className="text-gray-400 text-lg">Không có shop nào chờ phê duyệt</p>

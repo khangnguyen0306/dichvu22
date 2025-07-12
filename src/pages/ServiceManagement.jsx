@@ -7,7 +7,7 @@ import { ChevronDown, X } from 'lucide-react';
 import serviceService from '../service/serviceService';
 import categoryService from '../service/categoryService';
 
-const ShopAdmin = () => {
+const ServiceManagement = () => {
   const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({ 
@@ -44,12 +44,26 @@ const ShopAdmin = () => {
   const [newRequirement, setNewRequirement] = useState('');
   const [newInclude, setNewInclude] = useState('');
   const [newExclude, setNewExclude] = useState('');
+  
+  // Search and filter states
+  const [searchParams, setSearchParams] = useState({
+    keyword: '',
+    shopId: '',
+    categories: '',
+    minPrice: '',
+    maxPrice: '',
+    serviceType: '',
+    availability: ''
+  });
 
   // Fetch services from API
   const fetchServices = async () => {
     setLoading(true);
     try {
-      const res = await serviceService.getServices();
+      const params = Object.fromEntries(
+        Object.entries(searchParams).filter(([_, value]) => value !== '')
+      );
+      const res = await serviceService.getServices(params);
       setServices(res.data || []);
     } catch (error) {
       toast({ title: 'Lỗi', description: error.message || 'Không thể tải dịch vụ.' });
@@ -71,7 +85,7 @@ const ShopAdmin = () => {
   useEffect(() => {
     fetchServices();
     fetchCategories();
-  }, []);
+  }, [searchParams]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -280,12 +294,108 @@ const ShopAdmin = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Quản trị dịch vụ</h1>
+      <h1 className="text-2xl font-bold mb-6">Quản lý dịch vụ</h1>
+      
+      {/* Search and Filter Section */}
+      <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+        <h2 className="text-xl font-bold mb-4">Tìm kiếm và lọc</h2>
+        <div className="grid md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Từ khóa</label>
+            <Input
+              name="keyword"
+              placeholder="Tên dịch vụ..."
+              value={searchParams.keyword}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Shop ID</label>
+            <Input
+              name="shopId"
+              placeholder="ID shop..."
+              value={searchParams.shopId}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Danh mục</label>
+            <Input
+              name="categories"
+              placeholder="Danh mục..."
+              value={searchParams.categories}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Loại dịch vụ</label>
+            <select
+              name="serviceType"
+              value={searchParams.serviceType}
+              onChange={handleSearchChange}
+              className="w-full p-2 rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500/50 bg-white text-black"
+            >
+              <option value="">Tất cả</option>
+              <option value="onsite">Tại chỗ</option>
+              <option value="online">Trực tuyến</option>
+              <option value="both">Cả hai</option>
+            </select>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-4 gap-4 mt-4">
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Giá tối thiểu</label>
+            <Input
+              name="minPrice"
+              type="number"
+              placeholder="Giá tối thiểu..."
+              value={searchParams.minPrice}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Giá tối đa</label>
+            <Input
+              name="maxPrice"
+              type="number"
+              placeholder="Giá tối đa..."
+              value={searchParams.maxPrice}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Trạng thái</label>
+            <select
+              name="availability"
+              value={searchParams.availability}
+              onChange={handleSearchChange}
+              className="w-full p-2 rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500/50 bg-white text-black"
+            >
+              <option value="">Tất cả</option>
+              <option value="available">Có sẵn</option>
+              <option value="unavailable">Không có sẵn</option>
+            </select>
+          </div>
+          <div className="flex items-end">
+            <Button onClick={fetchServices} className="w-full">
+              Tìm kiếm
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="mb-4">
         <Button onClick={openAddModal}>Thêm dịch vụ</Button>
       </div>
+
+      {/* Service Form Modal */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -335,7 +445,7 @@ const ShopAdmin = () => {
                   className="w-full p-2 rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500/50 bg-white text-black"
                 >
                   <option value="onsite">Tại chỗ</option>
-                  <option value="offsite">Tại nhà</option>
+                  <option value="online">Trực tuyến</option>
                   <option value="both">Cả hai</option>
                 </select>
               </div>
@@ -641,6 +751,8 @@ const ShopAdmin = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Services Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white/5 rounded-lg">
           <thead>
@@ -701,11 +813,11 @@ const ShopAdmin = () => {
                   <td className="px-4 py-2">
                     <span className={`px-2 py-1 rounded text-xs ${
                       service.serviceType === 'onsite' ? 'bg-blue-600 text-white' :
-                      service.serviceType === 'offsite' ? 'bg-red-600 text-white' :
+                      service.serviceType === 'offsite ' ? 'bg-red-600 text-white' :
                       'bg-purple-600 text-white'
                     }`}>
                       {service.serviceType === 'onsite' ? 'Tại chỗ' :
-                       service.serviceType === 'offsite' ? 'Tại nhà' : 'Cả hai'}
+                       service.serviceType === 'offsite ' ? 'Tại nhà' : 'Cả hai'}
                     </span>
                   </td>
                   <td className="px-4 py-2">
@@ -738,4 +850,4 @@ const ShopAdmin = () => {
   );
 };
 
-export default ShopAdmin; 
+export default ServiceManagement; 
