@@ -22,6 +22,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ShopAdmin from './pages/ShopAdmin';
 import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
+import ShopDetail from './pages/ShopDetail';
 
 function App() {
     return (
@@ -43,6 +44,7 @@ function App() {
                             <Route path="booking/:serviceId" element={<BookingDetail />} />
                             <Route path="packages" element={<Packages />} />
                             <Route path="payment-success" element={<PaymentSuccess />} />
+                            <Route path="shop/:shopId" element={<ShopDetail />} />
                             <Route path="profile" element={
                                 <ProtectedRoute>
                                     <Profile />

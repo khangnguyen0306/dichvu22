@@ -15,6 +15,7 @@ const ServiceDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  console.log(service)
 
     useEffect(() => {
         const fetchServiceDetail = async () => {
@@ -114,6 +115,32 @@ const ServiceDetail = () => {
             >
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className="md:col-span-2">
+                        {/* Shop Info */}
+                        {service.shopId && (
+                            <div className="flex items-center gap-3 mb-4 p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer"
+                                 onClick={() => navigate(`/shop/${service.shopId._id || service.shopId.id}`)}>
+                                {service.shopId.shopLogoUrl ? (
+                                    <img 
+                                        src={service.shopId.shopLogoUrl} 
+                                        alt={service.shopId.shopName || service.shopId.name}
+                                        className="w-12 h-12 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">
+                                            {(service.shopId.shopName || service.shopId.name || 'S').charAt(0).toUpperCase()}
+                                        </span>
+                                    </div>
+                                )}
+                                <div>
+                                    <h3 className="font-semibold text-white hover:text-blue-400 transition-colors">
+                                        {service.shopId.shopName || service.shopId.name}
+                                    </h3>
+                                    <p className="text-sm text-gray-400">Nhấn để xem thông tin shop</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Service Category and Name */}
                         <div className="flex items-center gap-2 mb-2">
                             <p className="text-blue-400 font-semibold">
