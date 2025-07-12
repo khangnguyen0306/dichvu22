@@ -1,5 +1,9 @@
 import React from 'react';
 import { Button } from '../components/ui/button';
+import { toast } from '../components/ui/use-toast';
+import packageService from '../service/packageService';
+import { useAuth } from '../contexts/AuthContext';
+
 
 const packages = [
   {
@@ -29,6 +33,40 @@ const packages = [
 ];
 
 const Packages = () => {
+  const { user } = useAuth();
+  const handlePayment = async (pkg) => {
+    try {
+      const paymentData = {
+        amount: pkg.price,
+        description: `Đăng ký`,
+        shopId: user.shopId
+      };
+      
+      const result = await packageService.createPayment(paymentData);
+      
+      if (result.success && result.data.paymentUrl) {
+        // Mở URL thanh toán trong tab mới
+        window.open(result.data.paymentUrl, '_blank');
+        toast({
+          title: "Thành công",
+          description: "Đang chuyển hướng đến trang thanh toán..."
+        });
+      } else {
+        toast({
+          title: "Lỗi",
+          description: "Không thể tạo thanh toán. Vui lòng thử lại.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: error.message || "Có lỗi xảy ra khi tạo thanh toán.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-3xl font-bold text-center mb-8">Các Gói Dịch Vụ</h1>
@@ -42,7 +80,12 @@ const Packages = () => {
             <div className="text-3xl font-extrabold mb-2 text-white">{pkg.price.toLocaleString()}<span className="text-lg font-normal">đ</span></div>
             <div className="mb-4 text-gray-200">/{pkg.duration}</div>
             <div className="mb-6 text-center text-gray-300">{pkg.description}</div>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Chọn mua</Button>
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => handlePayment(pkg)}
+            >
+              Chọn mua
+            </Button>
           </div>
         ))}
       </div>
