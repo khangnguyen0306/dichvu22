@@ -233,7 +233,7 @@ const AdminStatistics = () => {
                 <meta name="description" content="Thống kê tổng quan hệ thống URGENT" />
             </Helmet>
             
-            <div className="space-y-8">
+            <div className="space-y-8 mt-[100px]">
                 <div className="flex items-center justify-between">
                     <h1 className="text-4xl font-bold text-blue-400">Thống Kê Hệ Thống</h1>
                     <div className="flex items-center gap-4">
