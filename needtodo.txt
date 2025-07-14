@@ -1,5 +1,4 @@
-+ create file service  with API authentication: Login, register, forgotpass, verifyEmail
-+ create file service CRUD product for seller
-+ create file service CRUD category for admin 
-+ create file service CRUD user for admin 
-+ create file service booking service 
+1. Thêm giao diện vào trang home, thêm các thông tin cho web thêm đẹp và sinh động.\
+2. thêm giao diện vào trang giới thiệu.
+3. thêm các trang giao diện khác nếu cần thêm nữa.
+4. Kiểm tra tất cả các form có liên quan đến giao tiếp API và validate các trường. ở password phải có nút xem, tắt xem.

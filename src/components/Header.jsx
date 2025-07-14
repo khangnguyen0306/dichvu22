@@ -62,6 +62,11 @@ const Header = () => {
             <Link to="/services" className="text-white hover:text-blue-300 transition-colors">
               Dịch vụ
             </Link>
+            <Link to="/terms" className="text-white hover:text-blue-300 transition-colors">
+              Điều khoản
+            </Link>
+     
+        
             
             {user ? (
               <div className="flex items-center space-x-4">
@@ -143,7 +148,15 @@ const Header = () => {
               <Link to="/services" className="block text-white hover:text-blue-300 transition-colors">
                 Dịch vụ
               </Link>
-              
+              <Link to="/faq" className="block text-white hover:text-blue-300 transition-colors">
+                FAQ
+              </Link>
+              <Link to="/terms" className="block text-white hover:text-blue-300 transition-colors">
+                Điều khoản
+              </Link>
+              <Link to="/privacy" className="block text-white hover:text-blue-300 transition-colors">
+                Bảo mật
+              </Link>
               {user ? (
                 <>
                   <Link to="/dashboard" className="block text-white hover:text-blue-300 transition-colors">

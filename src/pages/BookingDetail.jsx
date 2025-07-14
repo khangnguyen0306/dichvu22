@@ -150,6 +150,17 @@ const BookingDetail = () => {
         ));
     };
 
+    const validatePhone = (phone) => {
+        // Số điện thoại Việt Nam: 10 số, bắt đầu bằng 0 hoặc +84
+        const regex = /^(0|\+84)[0-9]{9}$/;
+        return regex.test(phone);
+    };
+    const validateEmail = (email) => {
+        // Định dạng email cơ bản
+        const regex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        return regex.test(email);
+    };
+
     const handleSubmitBooking = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -175,6 +186,27 @@ const BookingDetail = () => {
             toast({
                 title: "Thiếu thông tin bắt buộc",
                 description: `Vui lòng điền đầy đủ: ${missingFields.join(', ')}`,
+                variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Validate số điện thoại
+        if (!validatePhone(bookingData.customerPhone.trim())) {
+            toast({
+                title: "Số điện thoại không hợp lệ",
+                description: "Vui lòng nhập đúng định dạng số điện thoại Việt Nam.",
+                variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+        // Validate email
+        if (!validateEmail(bookingData.customerEmail.trim())) {
+            toast({
+                title: "Email không hợp lệ",
+                description: "Vui lòng nhập đúng định dạng email.",
                 variant: "destructive",
             });
             setIsSubmitting(false);

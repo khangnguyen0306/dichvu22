@@ -7,6 +7,9 @@ import { ArrowRight, Star, Loader2, AlertCircle, Clock, MapPin, CheckCircle, Use
 import { Helmet } from 'react-helmet';
 import { useToast } from "@/components/ui/use-toast";
 import { truncateText } from '@/utils/textUtils';
+import SliderBanner from '@/components/SliderBanner';
+import TestimonialSection from '@/components/TestimonialSection';
+import PartnerLogosSection from '@/components/PartnerLogosSection';
 
 const ServiceCard = ({ service, index }) => (
     <motion.div
@@ -174,6 +177,7 @@ const Home = () => {
                 <title>Trang Chủ - URGENT</title>
                 <meta name="description" content="Khám phá và đặt lịch các dịch vụ chất lượng cao từ các chuyên gia uy tín. URGENT là nền tảng kết nối dịch vụ tốt nhất." />
             </Helmet>
+            <SliderBanner />
             <div className="space-y-20">
                 {/* Hero Section */}
                 <motion.section
@@ -396,7 +400,8 @@ const Home = () => {
                         </motion.div>
                     </div>
                 </section>
-
+                <TestimonialSection />
+                <PartnerLogosSection />
                 {/* CTA Section */}
                 <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center">
                     <motion.div

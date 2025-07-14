@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Helmet } from 'react-helmet';
 import { authService } from '@/service/authService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
     const [firstName, setFirstName] = useState('');
@@ -32,6 +33,15 @@ const Register = () => {
     const [activeTab, setActiveTab] = useState('customer');
     const navigate = useNavigate();
     const { toast } = useToast();
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [phoneError, setPhoneError] = useState('');
+
+    const validatePhone = (phone) => {
+        // Số điện thoại Việt Nam: 10 số, bắt đầu bằng 0 hoặc +84
+        const regex = /^(0|\+84)[0-9]{9}$/;
+        return regex.test(phone);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -55,6 +65,14 @@ const Register = () => {
             setError('Vui lòng nhập đầy đủ họ và tên.');
             setIsLoading(false);
             return;
+        }
+
+        if (activeTab === 'shop') {
+            if (!validatePhone(contactPhone.trim())) {
+                setError('Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng Việt Nam.');
+                setIsLoading(false);
+                return;
+            }
         }
 
         try {
@@ -188,26 +206,47 @@ const Register = () => {
                                 </div>
                                 <div>
                                     <label className="text-sm font-bold text-gray-300 block mb-2">Mật khẩu</label>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
-                                        required
-                                        minLength={6}
-                                        placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition pr-12"
+                                            required
+                                            minLength={6}
+                                            placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-bold text-gray-300 block mb-2">Xác nhận Mật khẩu</label>
-                                    <input
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
-                                        required
-                                        placeholder="Nhập lại mật khẩu"
-                                    />
+                                    <label className="text-sm font-bold text-gray-300 block mb-2">Xác nhận mật khẩu</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition pr-12"
+                                            required
+                                            minLength={6}
+                                            placeholder="Nhập lại mật khẩu"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword((v) => !v)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none"
+                                            tabIndex={-1}
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 {error && <p className="text-red-400 text-sm">{error}</p>}
                                 <Button 
@@ -273,26 +312,46 @@ const Register = () => {
                                         </div>
                                         <div>
                                             <label className="text-sm font-bold text-gray-300 block mb-2">Mật khẩu *</label>
-                                            <input
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
-                                                required
-                                                minLength={6}
-                                                placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
-                                            />
+                                            <div className="relative">
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition pr-12"
+                                                    required
+                                                    minLength={6}
+                                                    placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((v) => !v)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="text-sm font-bold text-gray-300 block mb-2">Xác nhận Mật khẩu *</label>
-                                            <input
-                                                type="password"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
-                                                required
-                                                placeholder="Nhập lại mật khẩu"
-                                            />
+                                            <div className="relative">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    value={confirmPassword}
+                                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition pr-12"
+                                                    required
+                                                    placeholder="Nhập lại mật khẩu"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword((v) => !v)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none"
+                                                    tabIndex={-1}
+                                                >
+                                                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -395,7 +454,11 @@ const Register = () => {
                                                 onChange={(e) => setContactPhone(e.target.value)}
                                                 className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
                                                 placeholder="Nhập số điện thoại"
+                                                required
                                             />
+                                            {error && error.includes('Số điện thoại') && (
+                                                <p className="text-red-400 text-sm mt-1">{error}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

@@ -24,6 +24,9 @@ import ShopAdmin from './pages/ShopAdmin';
 import ShopBookingManagement from './pages/ShopBookingManagement';
 import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
+import FAQ from '@/pages/FAQ';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
 
 function App() {
     return (
@@ -40,6 +43,9 @@ function App() {
                             <Route index element={<Home />} />
                             <Route path="about" element={<AboutUs />} />
                             <Route path="contact" element={<Contact />} />
+                            <Route path="faq" element={<FAQ />} />
+                            <Route path="terms" element={<Terms />} />
+                            <Route path="privacy" element={<Privacy />} />
                             <Route path="services" element={<Services />} />
                             <Route path="services/:serviceId" element={<ServiceDetail />} />
                             <Route path="booking/:serviceId" element={<BookingDetail />} />

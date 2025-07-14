@@ -37,6 +37,11 @@ const Header = () => {
                     <Link to="/services" className="hover:text-blue-300 transition-colors">Dịch vụ</Link>
                     <Link to="/about" className="hover:text-blue-300 transition-colors">Về chúng tôi</Link>
                     <Link to="/contact" className="hover:text-blue-300 transition-colors">Liên hệ</Link>
+                    <Link to="/faq" className="hover:text-blue-300 transition-colors">FAQ</Link>
+                    <Link to="/terms" className="hover:text-blue-300 transition-colors">Điều khoản</Link>
+                    <Link to="/privacy" className="text-white hover:text-blue-300 transition-colors">
+              Bảo mật
+            </Link>
                     {user?.role === 'shop' && (
                         <Link to="/packages" className="hover:text-blue-300 transition-colors">Gói dịch vụ</Link>
                    )}

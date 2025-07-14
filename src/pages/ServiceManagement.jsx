@@ -39,6 +39,7 @@ const ServiceManagement = () => {
   const [loading, setLoading] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [formError, setFormError] = useState('');
   
   // New state for managing lists
   const [newRequirement, setNewRequirement] = useState('');
@@ -224,6 +225,19 @@ const ServiceManagement = () => {
       toast({ title: 'Vui lòng nhập đầy đủ tên, giá và chọn danh mục' });
       return;
     }
+    if (!isPositiveNumber(form.price)) {
+      setFormError('Giá dịch vụ phải là số dương.');
+      return;
+    }
+    if (form.duration && !isPositiveNumber(form.duration)) {
+      setFormError('Thời lượng phải là số dương.');
+      return;
+    }
+    if (form.maxBookings && !isPositiveNumber(form.maxBookings)) {
+      setFormError('Số lượng đặt tối đa phải là số dương.');
+      return;
+    }
+    setFormError('');
     try {
       const payload = {
         name: form.name,
@@ -297,6 +311,10 @@ const ServiceManagement = () => {
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
     setSearchParams(prev => ({ ...prev, [name]: value }));
+  };
+
+  const isPositiveNumber = (value) => {
+    return !isNaN(value) && Number(value) > 0;
   };
 
   return (
@@ -402,6 +420,7 @@ const ServiceManagement = () => {
             <DialogTitle>{editingId !== null ? 'Cập nhật dịch vụ' : 'Thêm dịch vụ'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {formError && <p className="text-red-400 text-sm mb-2">{formError}</p>}
             <div className="grid md:grid-cols-2 gap-4">
               <Input
                 name="name"

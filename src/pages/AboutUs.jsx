@@ -5,9 +5,9 @@ import { Users, Target, Eye } from 'lucide-react';
 
 const AboutUs = () => {
   const teamMembers = [
-    { name: 'Alex Johnson', role: 'CEO & Founder', image: 'team-member-1' },
-    { name: 'Maria Garcia', role: 'Lead Developer', image: 'team-member-2' },
-    { name: 'James Smith', role: 'Marketing Director', image: 'team-member-3' },
+    { name: 'Alex Johnson', role: 'CEO & Founder', image: 'https://randomuser.me/api/portraits/men/32.jpg', description: 'Người sáng lập và định hướng chiến lược phát triển.' },
+    { name: 'Maria Garcia', role: 'Lead Developer', image: 'https://randomuser.me/api/portraits/women/44.jpg', description: 'Chịu trách nhiệm phát triển và vận hành hệ thống.' },
+    { name: 'James Smith', role: 'Marketing Director', image: 'https://randomuser.me/api/portraits/men/65.jpg', description: 'Xây dựng thương hiệu và kết nối khách hàng.' },
   ];
 
   return (
@@ -73,6 +73,97 @@ const AboutUs = () => {
           </motion.div>
         </section>
 
+        {/* Core Values Section */}
+        <section className="py-12">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-white mb-4">Giá Trị Cốt Lõi</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">Những giá trị làm nên sự khác biệt của URGENT</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-gray-800 rounded-xl p-8 text-center border border-gray-700 hover:border-blue-400 transition-all"
+            >
+              <Users className="mx-auto h-10 w-10 text-blue-400 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Khách Hàng Là Trung Tâm</h3>
+              <p className="text-gray-400">Chúng tôi luôn đặt lợi ích và trải nghiệm của khách hàng lên hàng đầu.</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-gray-800 rounded-xl p-8 text-center border border-gray-700 hover:border-blue-400 transition-all"
+            >
+              <Target className="mx-auto h-10 w-10 text-blue-400 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Chất Lượng & Đổi Mới</h3>
+              <p className="text-gray-400">Không ngừng cải tiến để mang đến dịch vụ tốt nhất, ứng dụng công nghệ hiện đại.</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-gray-800 rounded-xl p-8 text-center border border-gray-700 hover:border-blue-400 transition-all"
+            >
+              <Eye className="mx-auto h-10 w-10 text-blue-400 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Minh Bạch & Tin Cậy</h3>
+              <p className="text-gray-400">Cam kết minh bạch trong mọi hoạt động, xây dựng niềm tin với khách hàng và đối tác.</p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Achievements/Stats Section */}
+        <section className="py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">Thành Tựu & Con Số Ấn Tượng</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">Những con số thể hiện sự phát triển và uy tín của URGENT</p>
+          </motion.div>
+          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-gray-800 rounded-xl p-8 border border-gray-700"
+            >
+              <h3 className="text-4xl font-bold text-blue-400 mb-2">10,000+</h3>
+              <p className="text-gray-400">Khách hàng hài lòng</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-gray-800 rounded-xl p-8 border border-gray-700"
+            >
+              <h3 className="text-4xl font-bold text-green-400 mb-2">500+</h3>
+              <p className="text-gray-400">Chuyên gia & đối tác</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-gray-800 rounded-xl p-8 border border-gray-700"
+            >
+              <h3 className="text-4xl font-bold text-purple-400 mb-2">99%</h3>
+              <p className="text-gray-400">Tỉ lệ hài lòng</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-gray-800 rounded-xl p-8 border border-gray-700"
+            >
+              <h3 className="text-4xl font-bold text-yellow-400 mb-2">2025</h3>
+              <p className="text-gray-400">Năm thành lập</p>
+            </motion.div>
+          </div>
+        </section>
+
         <section>
           <h2 className="text-4xl font-bold text-center mb-10">Gặp Gỡ Đội Ngũ</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -85,10 +176,61 @@ const AboutUs = () => {
                 className="bg-gray-800 rounded-lg p-6 text-center"
               >
                 <div className="w-32 h-32 rounded-full mx-auto mb-4 overflow-hidden border-4 border-blue-400">
-                  <img  class="w-full h-full object-cover" alt={`Portrait of ${member.name}`} src="https://images.unsplash.com/photo-1589132012505-a2d7a7a39589" />
+                  <img className="w-full h-full object-cover" alt={`Portrait of ${member.name}`} src={member.image} />
                 </div>
                 <h4 className="text-xl font-bold">{member.name}</h4>
                 <p className="text-blue-400">{member.role}</p>
+                <p className="text-gray-400 mt-2 text-sm">{member.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Testimonial Section */}
+        <section className="py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">Khách Hàng & Đối Tác Nói Gì?</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Những đánh giá thực tế từ khách hàng và đối tác đã đồng hành cùng URGENT
+            </p>
+          </motion.div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                name: 'Nguyễn Văn D',
+                avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+                content: 'Tôi rất ấn tượng với sự chuyên nghiệp và tận tâm của đội ngũ URGENT. Dịch vụ tuyệt vời!',
+                role: 'Khách hàng',
+              },
+              {
+                name: 'Lê Thị E',
+                avatar: 'https://randomuser.me/api/portraits/women/55.jpg',
+                content: 'Là đối tác của URGENT, tôi đánh giá cao sự minh bạch và hỗ trợ nhiệt tình từ hệ thống.',
+                role: 'Đối tác',
+              },
+              {
+                name: 'Phạm Văn F',
+                avatar: 'https://randomuser.me/api/portraits/men/77.jpg',
+                content: 'Nền tảng hiện đại, dễ sử dụng và rất hiệu quả cho cả khách hàng lẫn nhà cung cấp dịch vụ.',
+                role: 'Chuyên gia',
+              },
+            ].map((t, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.2 }}
+                className="bg-gray-800/80 rounded-2xl p-8 shadow-lg flex flex-col items-center text-center border border-gray-700 hover:border-blue-400 transition-all"
+              >
+                <img src={t.avatar} alt={t.name} className="w-20 h-20 rounded-full mb-4 border-4 border-blue-400 object-cover" />
+                <h3 className="text-xl font-bold text-white mb-1">{t.name}</h3>
+                <p className="text-blue-400 text-sm mb-2">{t.role}</p>
+                <p className="text-gray-300 text-base">"{t.content}"</p>
               </motion.div>
             ))}
           </div>

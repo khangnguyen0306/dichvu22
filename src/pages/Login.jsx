@@ -6,12 +6,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { Helmet } from 'react-helmet';
 import { authService } from '@/service';
 import { useAuth } from '@/contexts/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const { toast } = useToast();
@@ -88,14 +90,24 @@ const Login = () => {
                         </div>
                         <div>
                             <label className="text-sm font-bold text-gray-300 block mb-2">Mật khẩu</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition"
-                                required
-                                placeholder="Nhập mật khẩu của bạn"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition pr-12"
+                                    required
+                                    placeholder="Nhập mật khẩu của bạn"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                         </div>
                         {error && <p className="text-red-400 text-sm">{error}</p>}
                         <div className="flex items-center justify-between">
