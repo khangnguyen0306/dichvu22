@@ -100,7 +100,7 @@ export const shopService = {
     // Get shop profile
     async getShopProfile(shopId) {
         try {
-            const response = await api.get(`/shops/${shopId}/profile`);
+            const response = await api.get(`/shops/${shopId}`);
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Get shop profile failed' };
