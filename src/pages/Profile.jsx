@@ -24,8 +24,10 @@ import {
     Filter,
     Search,
     CreditCard,
-    Store
+    Store,
+    Star as StarIcon
 } from 'lucide-react';
+import { reviewService } from '@/service';
 
 const Profile = () => {
     const { user, logout } = useAuth();
@@ -50,6 +52,11 @@ const Profile = () => {
         total: 0,
         pages: 0
     });
+
+    // State cho form đánh giá booking
+    const [openReviewBookingId, setOpenReviewBookingId] = useState(null);
+    const [reviewForm, setReviewForm] = useState({ rating: 0, comment: '' });
+    const [submittingReview, setSubmittingReview] = useState(false);
 
     // Fetch user's booking history
     const fetchBookings = async (page = 1) => {
@@ -111,6 +118,37 @@ const Profile = () => {
             description: "Thay đổi mật khẩu sẽ sớm được hỗ trợ.",
             variant: "destructive",
         });
+    };
+
+    // Gửi đánh giá booking
+    const handleReviewSubmit = async (e, booking) => {
+        console.log(booking);
+        e.preventDefault();
+        if (!reviewForm.rating || !reviewForm.comment.trim()) {
+            toast({
+                title: 'Vui lòng nhập đủ số sao và bình luận!',
+                variant: 'destructive',
+            });
+            return;
+        }
+        setSubmittingReview(true);
+        try {
+            await reviewService.createServiceReview(booking._id, {
+                rating: reviewForm.rating,
+                comment: reviewForm.comment,
+            });
+            toast({ title: 'Đánh giá thành công!' });
+            setOpenReviewBookingId(null);
+            setReviewForm({ rating: 0, comment: '' });
+        } catch (err) {
+            toast({
+                title: 'Gửi đánh giá thất bại',
+                description: err?.message || 'Có lỗi xảy ra',
+                variant: 'destructive',
+            });
+        } finally {
+            setSubmittingReview(false);
+        }
     };
 
     const getStatusBadge = (status) => {
@@ -439,8 +477,62 @@ const Profile = () => {
                                                                 </p>
                                                             )}
                                                         </div>
+                                                        {/* Nút đánh giá cho booking đã hoàn thành */}
+                                                        {booking.status === 'completed' && (
+                                                            <>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    className="mt-2"
+                                                                    onClick={() => {
+                                                                        setOpenReviewBookingId(booking._id);
+                                                                        setReviewForm({ rating: 0, comment: '' });
+                                                                    }}
+                                                                    disabled={openReviewBookingId === booking._id}
+                                                                >
+                                                                    Đánh giá
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
+                                                {/* Form đánh giá */}
+                                                {openReviewBookingId === booking._id && (
+                                                    <form onSubmit={e => handleReviewSubmit(e, booking)} className="mt-4 bg-gray-800 p-4 rounded-lg">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            {[1,2,3,4,5].map((star) => (
+                                                                <button
+                                                                    type="button"
+                                                                    key={star}
+                                                                    onClick={() => setReviewForm(f => ({ ...f, rating: star }))}
+                                                                    className="focus:outline-none"
+                                                                >
+                                                                    <StarIcon
+                                                                        className={`w-7 h-7 ${reviewForm.rating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`}
+                                                                        fill={reviewForm.rating >= star ? '#facc15' : 'none'}
+                                                                    />
+                                                                </button>
+                                                            ))}
+                                                            <span className="ml-2 text-gray-300">{reviewForm.rating > 0 ? `${reviewForm.rating} sao` : ''}</span>
+                                                        </div>
+                                                        <textarea
+                                                            className="w-full p-2 rounded bg-gray-900 text-gray-100 mb-2 border border-gray-600 focus:border-blue-400"
+                                                            rows={3}
+                                                            placeholder="Nhập bình luận của bạn..."
+                                                            value={reviewForm.comment}
+                                                            onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                                                            disabled={submittingReview}
+                                                        />
+                                                        <div className="flex gap-2">
+                                                            <Button type="submit" className="mt-2" disabled={submittingReview}>
+                                                                {submittingReview ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+                                                                Gửi đánh giá
+                                                            </Button>
+                                                            <Button type="button" variant="ghost" className="mt-2" onClick={() => setOpenReviewBookingId(null)} disabled={submittingReview}>
+                                                                Hủy
+                                                            </Button>
+                                                        </div>
+                                                    </form>
+                                                )}
                                             </div>
                                         ))}
                                         

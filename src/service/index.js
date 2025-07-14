@@ -9,3 +9,4 @@ export { productTypeService } from './productTypeService';
 export { serviceService } from './serviceService'; 
 export { dashboardService } from './dashboardService';
 export { paymentService } from './paymentService';
+export { reviewService } from './reviewService';

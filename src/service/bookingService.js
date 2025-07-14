@@ -94,5 +94,6 @@ export const bookingService = {
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Không thể cập nhật trạng thái đặt lịch');
         }
-    }
+    },
+   
 }; 

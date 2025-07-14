@@ -3,9 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { serviceService } from '@/service';
 import { Button } from '@/components/ui/button';
-import { Star, ShoppingCart, MessageSquare, Loader2, AlertCircle, Package, Info, Clock, MapPin, CheckCircle, XCircle, Calendar } from 'lucide-react';
+import { Star, ShoppingCart, MessageSquare, Loader2, AlertCircle, Package, Info, Clock, MapPin, CheckCircle, XCircle, Calendar, Star as StarIcon } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { Helmet } from 'react-helmet';
+import { reviewService } from '@/service';
 
 const ServiceDetail = () => {
     const { serviceId } = useParams();
@@ -15,7 +16,10 @@ const ServiceDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  console.log(service)
+    const [reviews, setReviews] = useState([]);
+    const [reviewLoading, setReviewLoading] = useState(false);
+    const [reviewForm, setReviewForm] = useState({ rating: 0, comment: '' });
+    const [submittingReview, setSubmittingReview] = useState(false);
 
     useEffect(() => {
         const fetchServiceDetail = async () => {
@@ -41,6 +45,23 @@ const ServiceDetail = () => {
             fetchServiceDetail();
         }
     }, [serviceId, toast]);
+
+    // Fetch reviews
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (!serviceId) return;
+            setReviewLoading(true);
+            try {
+                const res = await reviewService.getServiceReviews(serviceId);
+                setReviews(res.data || []);
+            } catch (err) {
+                setReviews([]);
+            } finally {
+                setReviewLoading(false);
+            }
+        };
+        fetchReviews();
+    }, [serviceId]);
 
     if (isLoading) {
         return (
@@ -78,6 +99,37 @@ const ServiceDetail = () => {
             description: "Đừng lo! Bạn có thể yêu cầu nó trong lần nhắc tiếp theo! 🚀",
             variant: "destructive",
         });
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        if (!reviewForm.rating || !reviewForm.comment.trim()) {
+            toast({
+                title: 'Vui lòng nhập đủ số sao và bình luận!',
+                variant: 'destructive',
+            });
+            return;
+        }
+        setSubmittingReview(true);
+        try {
+            await reviewService.createServiceReview(serviceId, {
+                rating: reviewForm.rating,
+                comment: reviewForm.comment,
+            });
+            toast({ title: 'Đánh giá thành công!' });
+            setReviewForm({ rating: 0, comment: '' });
+            // Reload reviews
+            const res = await reviewService.getServiceReviews(serviceId);
+            setReviews(res.data.data || []);
+        } catch (err) {
+            toast({
+                title: 'Gửi đánh giá thất bại',
+                description: err?.message || 'Có lỗi xảy ra',
+                variant: 'destructive',
+            });
+        } finally {
+            setSubmittingReview(false);
+        }
     };
 
     const formatWorkingHours = (workingHours) => {
@@ -357,6 +409,38 @@ const ServiceDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* --- ĐÁNH GIÁ & BÌNH LUẬN --- */}
+                <div className="mb-10 mt-10">
+                    <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                     Đánh giá dịch vụ
+                    </h2>
+             
+                    {/* Danh sách review */}
+                    {reviewLoading ? (
+                        <div className="flex items-center gap-2 text-gray-400"><Loader2 className="animate-spin w-5 h-5" /> Đang tải đánh giá...</div>
+                    ) : reviews.length === 0 ? (
+                        <div className="text-gray-400">Chưa có đánh giá nào cho dịch vụ này.</div>
+                    ) : (
+                        <div className="space-y-6">
+                            {reviews.map((rv) => (
+                                <div key={rv._id} className="bg-gray-800 p-4 rounded-lg shadow flex flex-col  gap-2">
+                                    <div className="flex items-center gap-1 mb-1 md:mb-0 ">
+                                        {[1,2,3,4,5].map(star => (
+                                            <StarIcon key={star} className={`w-5 h-5 ${rv.rating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`} fill={rv.rating >= star ? '#facc15' : 'none'} />
+                                        ))}
+                                    </div>
+                                    <h2 className="text-lg font-bold">{rv.customerId?.email}</h2>
+                                    <div className="flex-1">
+                                        <div className="text-gray-200 font-medium">{rv.comment}</div>
+                                        <div className="text-xs text-gray-400 mt-1">{new Date(rv.createdAt).toLocaleString('vi-VN')}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                {/* --- END ĐÁNH GIÁ & BÌNH LUẬN --- */}
             </motion.div>
         </>
     );

@@ -39,7 +39,6 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/verify-email/:token" element={<VerifyEmail />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
-                        
                         <Route path="/" element={<Layout />}>
                             <Route index element={<Home />} />
                             <Route path="about" element={<AboutUs />} />
