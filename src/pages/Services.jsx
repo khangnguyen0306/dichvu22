@@ -96,16 +96,40 @@ const Services = () => {
         pages: 0
     });
 
-    // Search and filter states
+    // Search and filter states (immediate updates)
     const [searchFilters, setSearchFilters] = useState({
         keyword: searchParams.get('keyword') || '',
-        shopId: searchParams.get('shopId') || '',
         categories: searchParams.get('categories') || '',
         minPrice: searchParams.get('minPrice') || '',
         maxPrice: searchParams.get('maxPrice') || '',
         serviceType: searchParams.get('serviceType') || '',
         availability: searchParams.get('availability') || ''
     });
+
+    // Debounced search filters (used for API calls)
+    const [debouncedSearchFilters, setDebouncedSearchFilters] = useState(searchFilters);
+
+    // Debounce search filters
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchFilters(searchFilters);
+            // Reset to page 1 when search filters change
+            setPagination(prev => ({ ...prev, page: 1 }));
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [searchFilters]);
+
+    // Update URL params when debounced filters change
+    useEffect(() => {
+        const params = {
+            page: pagination.page,
+            ...Object.fromEntries(
+                Object.entries(debouncedSearchFilters).filter(([_, value]) => value !== '')
+            )
+        };
+        setSearchParams(params);
+    }, [debouncedSearchFilters, pagination.page, setSearchParams]);
 
     // Fetch services and categories from API
     useEffect(() => {
@@ -119,7 +143,7 @@ const Services = () => {
                     page: pagination.page,
                     limit: pagination.limit,
                     ...Object.fromEntries(
-                        Object.entries(searchFilters).filter(([_, value]) => value !== '')
+                        Object.entries(debouncedSearchFilters).filter(([_, value]) => value !== '')
                     )
                 };
                 
@@ -154,17 +178,12 @@ const Services = () => {
         };
 
         fetchData();
-    }, [searchFilters, pagination.page, pagination.limit, toast]);
+    }, [debouncedSearchFilters, pagination.page, pagination.limit, toast]);
 
     const handleSearch = (e) => {
         e.preventDefault();
-        const params = {
-            page: 1, // Reset to first page when searching
-            ...Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => value !== '')
-            )
-        };
-        setSearchParams(params);
+        // Immediately apply current search filters (will trigger debounce)
+        setDebouncedSearchFilters(searchFilters);
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
@@ -173,40 +192,25 @@ const Services = () => {
     };
 
     const clearFilters = () => {
-        setSearchFilters({
+        const clearedFilters = {
             keyword: '',
-            shopId: '',
             categories: '',
             minPrice: '',
             maxPrice: '',
             serviceType: '',
             availability: ''
-        });
-        setSearchParams({ page: 1 });
+        };
+        setSearchFilters(clearedFilters);
+        setDebouncedSearchFilters(clearedFilters);
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
     const handlePageChange = (newPage) => {
         setPagination(prev => ({ ...prev, page: newPage }));
-        const params = {
-            page: newPage,
-            ...Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => value !== '')
-            )
-        };
-        setSearchParams(params);
     };
 
     const handleLimitChange = (newLimit) => {
         setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
-        const params = {
-            page: 1,
-            limit: newLimit,
-            ...Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => value !== '')
-            )
-        };
-        setSearchParams(params);
     };
 
     if (isLoading) {
@@ -248,7 +252,7 @@ const Services = () => {
                 <div className="bg-gray-800 p-6 rounded-lg shadow-md">
                     <h1 className="text-4xl font-bold text-blue-400 mb-4">Khám Phá Dịch Vụ</h1>
                     <form onSubmit={handleSearch} className="space-y-4">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div className="relative">
                                 <label className="text-sm font-bold text-gray-300 block mb-2">Từ khóa</label>
                                 <input
@@ -259,16 +263,6 @@ const Services = () => {
                                     className="w-full p-3 pl-10 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
                                 />
                                 <Search className="absolute left-3 top-11 text-gray-400" size={20} />
-                            </div>
-                            <div>
-                                <label className="text-sm font-bold text-gray-300 block mb-2">Shop ID</label>
-                                <input
-                                    type="text"
-                                    placeholder="ID shop..."
-                                    value={searchFilters.shopId}
-                                    onChange={(e) => handleFilterChange('shopId', e.target.value)}
-                                    className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
-                                />
                             </div>
                             <div>
                                 <label className="text-sm font-bold text-gray-300 block mb-2">Danh mục</label>
