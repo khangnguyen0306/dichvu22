@@ -309,37 +309,53 @@ const Home = () => {
                     </div>
                     
                     {categories.length > 0 ? (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {categories.map((category, index) => (
-                                <motion.div
-                                    key={category._id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                >
-                                    <Link to={`/services?categories=${category.name}`}>
-                                        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-blue-500 hover:bg-gray-800 transition-all duration-300 group">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
-                                                    {category.name}
-                                                </h3>
-                                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                        <>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {categories.slice(0, 6).map((category, index) => (
+                                    <motion.div
+                                        key={category._id}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                                    >
+                                        <Link to={`/services?categories=${category.name}`}>
+                                            <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-blue-500 hover:bg-gray-800 transition-all duration-300 group">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                                                        {category.name}
+                                                    </h3>
+                                                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                                                </div>
+                                                {category.description && (
+                                                    <p className="text-gray-400 text-sm leading-relaxed" title={category.description}>
+                                                        {truncateText(category.description, 80)}
+                                                    </p>
+                                                )}
+                                                <div className="mt-4 flex items-center text-sm text-gray-400">
+                                                    <span className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-xs">
+                                                        {services.filter(s => s.categories?.some(c => c.name === category.name)).length} dịch vụ
+                                                    </span>
+                                                </div>
                                             </div>
-                                            {category.description && (
-                                                <p className="text-gray-400 text-sm leading-relaxed" title={category.description}>
-                                                    {truncateText(category.description, 80)}
-                                                </p>
-                                            )}
-                                            <div className="mt-4 flex items-center text-sm text-gray-400">
-                                                <span className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-xs">
-                                                    {services.filter(s => s.categories?.some(c => c.name === category.name)).length} dịch vụ
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            ))}
-                        </div>
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                            </div>
+                            {categories.length > 8 && (
+                                <div className="text-center mt-8">
+                                    <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                                        <p className="text-gray-400 mb-2">
+                                            Và còn <span className="text-blue-400 font-semibold">{categories.length - 8}</span> danh mục khác
+                                        </p>
+                                        <Link to="/services">
+                                            <Button variant="outline" className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white">
+                                                Xem tất cả danh mục
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div className="text-center py-16">
                             <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
