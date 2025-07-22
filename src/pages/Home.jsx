@@ -318,7 +318,7 @@ const Home = () => {
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.3, delay: index * 0.05 }}
                                     >
-                                        <Link to={`/services?categories=${category.name}`}>
+                                        <Link to={`/services?categories=${category._id}`}>
                                             <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-blue-500 hover:bg-gray-800 transition-all duration-300 group">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
@@ -333,7 +333,7 @@ const Home = () => {
                                                 )}
                                                 <div className="mt-4 flex items-center text-sm text-gray-400">
                                                     <span className="bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-xs">
-                                                        {services.filter(s => s.categories?.some(c => c.name === category.name)).length} dịch vụ
+                                                        {category.serviceCount || 0} dịch vụ
                                                     </span>
                                                 </div>
                                             </div>

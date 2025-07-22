@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Helmet } from 'react-helmet';
 import { useAuth } from '../contexts/AuthContext';
-import { bookingService } from '@/service';
+import { bookingService, userService } from '@/service';
 import { formatCurrency, formatDate } from '@/utils/textUtils';
 import { useSearchParams } from 'react-router-dom';
 import { 
@@ -33,8 +33,23 @@ const Profile = () => {
     const { user, logout } = useAuth();
     const { toast } = useToast();
     const [searchParams] = useSearchParams();
-    const [name, setName] = useState(user?.username || '');
-    const [email, setEmail] = useState(user?.email || '');
+    
+    // Profile form states
+    const [profileForm, setProfileForm] = useState({
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        address: user?.address || '',
+        email: user?.email || ''
+    });
+    const [isUpdating, setIsUpdating] = useState(false);
+    
+    // Password form states
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
     
     // Get default tab from URL parameter
     const defaultTab = searchParams.get('tab') === 'bookings' ? 'bookings' : 'profile';
@@ -57,6 +72,27 @@ const Profile = () => {
     const [openReviewBookingId, setOpenReviewBookingId] = useState(null);
     const [reviewForm, setReviewForm] = useState({ rating: 0, comment: '' });
     const [submittingReview, setSubmittingReview] = useState(false);
+
+    // Update profile form when user data changes
+    useEffect(() => {
+        if (user) {
+            setProfileForm({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                address: user.address || '',
+                email: user.email || ''
+            });
+        }
+    }, [user]);
+
+    // Handle profile form input changes
+    const handleProfileInputChange = (e) => {
+        const { name, value } = e.target;
+        setProfileForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
     // Fetch user's booking history
     const fetchBookings = async (page = 1) => {
@@ -102,22 +138,107 @@ const Profile = () => {
         fetchBookings(1);
     }, [user, bookingFilter, paymentFilter, searchKeyword]);
 
-    const handleProfileUpdate = (e) => {
+    const handleProfileUpdate = async (e) => {
         e.preventDefault();
-        toast({
-            title: "🚧 Tính năng này chưa được triển khai!",
-            description: "Cập nhật hồ sơ sẽ sớm được hỗ trợ.",
-            variant: "destructive",
-        });
+        
+        // Basic validation
+        if (!profileForm.firstName.trim() || !profileForm.lastName.trim()) {
+            toast({
+                title: "Thông tin không hợp lệ",
+                description: "Vui lòng nhập đầy đủ tên và họ.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setIsUpdating(true);
+        try {
+            await userService.updateProfile(profileForm);
+            
+            toast({
+                title: "Cập nhật thành công!",
+                description: "Thông tin hồ sơ của bạn đã được cập nhật.",
+            });
+        } catch (error) {
+            console.error('Profile update error:', error);
+            toast({
+                title: "Lỗi cập nhật",
+                description: error.message || "Có lỗi xảy ra khi cập nhật hồ sơ.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsUpdating(false);
+        }
     };
     
-    const handlePasswordChange = (e) => {
+    const handlePasswordChange = async (e) => {
         e.preventDefault();
-        toast({
-            title: "🚧 Tính năng này chưa được triển khai!",
-            description: "Thay đổi mật khẩu sẽ sớm được hỗ trợ.",
-            variant: "destructive",
-        });
+        
+        // Validation
+        if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+            toast({
+                title: "Thông tin không đầy đủ",
+                description: "Vui lòng điền đầy đủ tất cả trường mật khẩu.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            toast({
+                title: "Mật khẩu không khớp",
+                description: "Mật khẩu mới và xác nhận mật khẩu không giống nhau.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (passwordForm.newPassword.length < 6) {
+            toast({
+                title: "Mật khẩu quá ngắn",
+                description: "Mật khẩu mới phải có ít nhất 6 ký tự.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            await userService.changePassword({
+                currentPassword: passwordForm.currentPassword,
+                newPassword: passwordForm.newPassword
+            });
+            
+            // Clear form
+            setPasswordForm({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            });
+            
+            toast({
+                title: "Đổi mật khẩu thành công!",
+                description: "Mật khẩu của bạn đã được thay đổi.",
+            });
+        } catch (error) {
+            console.error('Password change error:', error);
+            toast({
+                title: "Lỗi đổi mật khẩu",
+                description: error.message || "Có lỗi xảy ra khi đổi mật khẩu.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
+    // Handle password form input changes
+    const handlePasswordInputChange = (e) => {
+        const { name, value } = e.target;
+        setPasswordForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     // Gửi đánh giá booking
@@ -234,40 +355,121 @@ const Profile = () => {
                     <TabsContent value="profile">
                         <div className="space-y-8">
                             {/* Profile Info */}
-                            <Card className="bg-gray-800 border-gray-700">
-                                <CardHeader>
-                                    <CardTitle className="text-white">Thông Tin Cá Nhân</CardTitle>
+                            <Card className="bg-gray-800 border-gray-700 shadow-xl">
+                                <CardHeader className="pb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                            <User className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-white text-xl">Thông Tin Cá Nhân</CardTitle>
+                                            <p className="text-gray-400 text-sm">Cập nhật thông tin hồ sơ của bạn</p>
+                                        </div>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <form onSubmit={handleProfileUpdate} className="space-y-4">
-                                        <div>
-                                            <label className="text-sm font-bold text-gray-300 block mb-2">
-                                                <User className="w-4 h-4 inline mr-2" />
-                                                Tên
-                                            </label>
-                                            <input 
-                                                type="text" 
-                                                value={name} 
-                                                onChange={e => setName(e.target.value)} 
-                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
-                                            />
+                                    <form onSubmit={handleProfileUpdate} className="space-y-6">
+                                        {/* Name Fields Row */}
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-sm font-bold text-gray-300 block mb-2">
+                                                    <User className="w-4 h-4 inline mr-2" />
+                                                    Tên <span className="text-red-400">*</span>
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    value={profileForm.firstName} 
+                                                    onChange={handleProfileInputChange} 
+                                                    name="firstName"
+                                                    placeholder="Nhập tên của bạn"
+                                                    className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder-gray-400"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-sm font-bold text-gray-300 block mb-2">
+                                                    <User className="w-4 h-4 inline mr-2" />
+                                                    Họ <span className="text-red-400">*</span>
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    value={profileForm.lastName} 
+                                                    onChange={handleProfileInputChange} 
+                                                    name="lastName"
+                                                    placeholder="Nhập họ của bạn"
+                                                    className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder-gray-400"
+                                                    required
+                                                />
+                                            </div>
                                         </div>
+
+                                        {/* Email Field */}
                                         <div>
                                             <label className="text-sm font-bold text-gray-300 block mb-2">
                                                 <Mail className="w-4 h-4 inline mr-2" />
                                                 Email
+                                                <span className="ml-2 px-2 py-1 text-xs bg-gray-600 text-gray-300 rounded-full">
+                                                    Chỉ đọc
+                                                </span>
                                             </label>
-                                            <input 
-                                                type="email" 
-                                                value={email} 
-                                                onChange={e => setEmail(e.target.value)} 
-                                                className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                            <div className="relative">
+                                                <input 
+                                                    type="email" 
+                                                    value={profileForm.email} 
+                                                    name="email"
+                                                    className="w-full p-3 bg-gray-600 rounded-lg border border-gray-500 text-gray-300 cursor-not-allowed"
+                                                    readOnly
+                                                />
+                                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                    <Lock className="w-4 h-4 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                Email không thể thay đổi sau khi đăng ký
+                                            </p>
+                                        </div>
+
+                                        {/* Address Field */}
+                                        <div>
+                                            <label className="text-sm font-bold text-gray-300 block mb-2">
+                                                <MapPin className="w-4 h-4 inline mr-2" />
+                                                Địa chỉ
+                                            </label>
+                                            <textarea
+                                                value={profileForm.address} 
+                                                onChange={handleProfileInputChange} 
+                                                name="address"
+                                                placeholder="Nhập địa chỉ của bạn (tùy chọn)"
+                                                rows="3"
+                                                className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder-gray-400 resize-none"
                                             />
                                         </div>
-                                        <div className="pt-2">
-                                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                                Cập Nhật Hồ Sơ
-                                            </Button>
+
+                                        {/* Submit Button */}
+                                        <div className="pt-4 border-t border-gray-600">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm text-gray-400">
+                                                    <span className="text-red-400">*</span> Trường bắt buộc
+                                                </p>
+                                                <Button 
+                                                    type="submit" 
+                                                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-medium shadow-lg transition-all duration-200"
+                                                    disabled={isUpdating}
+                                                >
+                                                    {isUpdating ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                            Đang cập nhật...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                                            Cập Nhật Hồ Sơ
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </form>
                                 </CardContent>
@@ -288,6 +490,9 @@ const Profile = () => {
                                             <input 
                                                 type="password" 
                                                 className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                                name="currentPassword"
+                                                value={passwordForm.currentPassword}
+                                                onChange={handlePasswordInputChange}
                                             />
                                         </div>
                                         <div>
@@ -298,6 +503,9 @@ const Profile = () => {
                                             <input 
                                                 type="password" 
                                                 className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                                name="newPassword"
+                                                value={passwordForm.newPassword}
+                                                onChange={handlePasswordInputChange}
                                             />
                                         </div>
                                         <div>
@@ -308,11 +516,21 @@ const Profile = () => {
                                             <input 
                                                 type="password" 
                                                 className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white" 
+                                                name="confirmPassword"
+                                                value={passwordForm.confirmPassword}
+                                                onChange={handlePasswordInputChange}
                                             />
                                         </div>
                                         <div className="pt-2">
-                                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                                Thay Đổi Mật Khẩu
+                                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isChangingPassword}>
+                                                {isChangingPassword ? (
+                                                    <>
+                                                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                                                        Đổi mật khẩu...
+                                                    </>
+                                                ) : (
+                                                    "Thay Đổi Mật Khẩu"
+                                                )}
                                             </Button>
                                         </div>
                                     </form>

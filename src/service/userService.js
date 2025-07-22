@@ -235,6 +235,36 @@ export const userService = {
                 throw error.response?.data || { message: 'Export users failed' };
         }
     },
+
+    // Update current user's profile (non-admin)
+    async updateProfile(profileData) {
+        try {
+            const response = await api.put('/users/update-profile', profileData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Update profile failed' };
+        }
+    },
+
+    // Get current user's profile (non-admin)
+    async getProfile() {
+        try {
+            const response = await api.get('/users/profile');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Get profile failed' };
+        }
+    },
+
+    // Change current user's password
+    async changePassword(passwordData) {
+        try {
+            const response = await api.put('/users/change-password', passwordData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Change password failed' };
+        }
+    },
 };
 
 export default userService; 

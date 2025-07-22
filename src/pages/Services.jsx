@@ -91,7 +91,7 @@ const Services = () => {
     // Pagination state
     const [pagination, setPagination] = useState({
         page: parseInt(searchParams.get('page')) || 1,
-        limit: 12,
+        limit: parseInt(searchParams.get('limit')) || 16,
         total: 0,
         pages: 0
     });
@@ -124,12 +124,13 @@ const Services = () => {
     useEffect(() => {
         const params = {
             page: pagination.page,
+            limit: pagination.limit,
             ...Object.fromEntries(
                 Object.entries(debouncedSearchFilters).filter(([_, value]) => value !== '')
             )
         };
         setSearchParams(params);
-    }, [debouncedSearchFilters, pagination.page, setSearchParams]);
+    }, [debouncedSearchFilters, pagination.page, pagination.limit, setSearchParams]);
 
     // Fetch services and categories from API
     useEffect(() => {
@@ -153,15 +154,38 @@ const Services = () => {
                     categoryService.getCategories()
                 ]);
                 
+                // Debug: Log the response structure
+                console.log('Services Response:', servicesResponse);
+                console.log('Pagination Data:', servicesResponse.pagination || 'No pagination field');
+                
                 setServices(servicesResponse.data || []);
                 setCategories(categoriesResponse.data || categoriesResponse);
                 
-                // Update pagination from response
+                // Update pagination from response - check multiple possible locations
+                let paginationData = null;
+                
+                // Try different response structures
                 if (servicesResponse.pagination) {
+                    paginationData = servicesResponse.pagination;
+                } else if (servicesResponse.page !== undefined) {
+                    // Pagination data at root level
+                    paginationData = {
+                        page: servicesResponse.page,
+                        pages: servicesResponse.pages,
+                        total: servicesResponse.total,
+                        limit: servicesResponse.limit
+                    };
+                }
+                
+                console.log('Extracted Pagination Data:', paginationData);
+                
+                if (paginationData) {
                     setPagination(prev => ({
                         ...prev,
-                        total: servicesResponse.pagination.total || 0,
-                        pages: servicesResponse.pagination.pages || 0
+                        page: paginationData.page || prev.page,
+                        pages: paginationData.pages || 0,
+                        total: paginationData.total || 0,
+                        limit: paginationData.limit || prev.limit
                     }));
                 }
             } catch (error) {
@@ -202,6 +226,7 @@ const Services = () => {
         };
         setSearchFilters(clearedFilters);
         setDebouncedSearchFilters(clearedFilters);
+        // Only reset page to 1, keep limit unchanged
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
@@ -266,13 +291,18 @@ const Services = () => {
                             </div>
                             <div>
                                 <label className="text-sm font-bold text-gray-300 block mb-2">Danh mục</label>
-                                <input
-                                    type="text"
-                                    placeholder="Danh mục..."
+                                <select
                                     value={searchFilters.categories}
                                     onChange={(e) => handleFilterChange('categories', e.target.value)}
                                     className="w-full p-3 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 transition text-white"
-                                />
+                                >
+                                    <option value="">Tất cả danh mục</option>
+                                    {categories.map((category) => (
+                                        <option key={category._id} value={category._id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="text-sm font-bold text-gray-300 block mb-2">Loại dịch vụ</label>
@@ -336,6 +366,7 @@ const Services = () => {
                         <span>
                             Hiển thị {services.length} dịch vụ
                             {pagination.total > 0 && ` / ${pagination.total} tổng cộng`}
+                            {pagination.pages > 0 && ` (trang ${pagination.page}/${pagination.pages})`}
                         </span>
                         <div className="flex items-center gap-4">
                             <span>
@@ -348,8 +379,10 @@ const Services = () => {
                                     onChange={(e) => handleLimitChange(parseInt(e.target.value))}
                                     className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm"
                                 >
-                                    <option value={12}>12</option>
+                                    <option value={8}>8</option>
+                                    <option value={16}>16</option>
                                     <option value={24}>24</option>
+                                    <option value={32}>32</option>
                                     <option value={48}>48</option>
                                 </select>
                             </div>
@@ -364,20 +397,47 @@ const Services = () => {
                 </motion.div>
                 
                 {/* Pagination */}
-                {pagination.pages > 1 && (
-                    <div className="flex justify-center mt-8">
+             
+                    <div className="flex flex-col items-center gap-4 mt-8">
+                        {/* Pagination Info */}
+                        <div className="text-sm text-gray-400">
+                            Trang <span className="text-blue-400 font-semibold">{pagination.page}</span> 
+                            {' '}trên <span className="text-blue-400 font-semibold">{pagination.pages}</span>
+                            {' '}({pagination.total} dịch vụ)
+                        </div>
+
+                        {/* Pagination Controls */}
                         <div className="flex items-center gap-2">
+                            {/* Previous Button */}
                             <Button
                                 variant="outline"
                                 onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
                                 disabled={pagination.page === 1}
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white disabled:opacity-50"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                                 Trước
                             </Button>
                             
+                            {/* Page Numbers */}
                             <div className="flex items-center gap-1">
+                                {/* First page */}
+                                {pagination.page > 3 && pagination.pages > 5 && (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handlePageChange(1)}
+                                            className="w-10 h-10 p-0 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                                        >
+                                            1
+                                        </Button>
+                                        {pagination.page > 4 && (
+                                            <span className="px-2 text-gray-500">...</span>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* Page numbers around current page */}
                                 {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
                                     let pageNum;
                                     if (pagination.pages <= 5) {
@@ -395,27 +455,68 @@ const Services = () => {
                                             key={pageNum}
                                             variant={pagination.page === pageNum ? "default" : "outline"}
                                             onClick={() => handlePageChange(pageNum)}
-                                            className="w-10 h-10 p-0"
+                                            className={`w-10 h-10 p-0 ${
+                                                pagination.page === pageNum
+                                                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                                                    : 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white'
+                                            }`}
                                         >
                                             {pageNum}
                                         </Button>
                                     );
                                 })}
+
+                                {/* Last page */}
+                                {pagination.page < pagination.pages - 2 && pagination.pages > 5 && (
+                                    <>
+                                        {pagination.page < pagination.pages - 3 && (
+                                            <span className="px-2 text-gray-500">...</span>
+                                        )}
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handlePageChange(pagination.pages)}
+                                            className="w-10 h-10 p-0 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                                        >
+                                            {pagination.pages}
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                             
+                            {/* Next Button */}
                             <Button
                                 variant="outline"
                                 onClick={() => handlePageChange(Math.min(pagination.pages, pagination.page + 1))}
                                 disabled={pagination.page === pagination.pages}
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white disabled:opacity-50"
                             >
                                 Sau
                                 <ChevronRight className="w-4 h-4" />
                             </Button>
                         </div>
+
+                        {/* Quick Jump */}
+                        {pagination.pages > 5 && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <span className="text-gray-400">Nhảy đến trang:</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max={pagination.pages}
+                                    value={pagination.page}
+                                    onChange={(e) => {
+                                        const page = parseInt(e.target.value);
+                                        if (page >= 1 && page <= pagination.pages) {
+                                            handlePageChange(page);
+                                        }
+                                    }}
+                                    className="w-16 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-center focus:border-blue-500 focus:outline-none"
+                                />
+                                <span className="text-gray-400">/ {pagination.pages}</span>
+                            </div>
+                        )}
                     </div>
-                )}
-                
+     
                 {services.length === 0 && !isLoading && (
                     <div className="text-center py-16">
                         <p className="text-2xl text-gray-400">Không tìm thấy dịch vụ nào.</p>
