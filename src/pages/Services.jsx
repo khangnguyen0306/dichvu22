@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -52,14 +52,14 @@ const ServiceCard = ({ service }) => (
             </div>
             <div className="flex items-center text-gray-400 text-sm mb-4">
                 <MapPin className="w-4 h-4 mr-1" />
-                <span className={`px-2 py-1 rounded text-xs ${
+                <p className={`px-2 py-1 rounded text-xs ${
                     service.serviceType === 'onsite' ? 'bg-blue-600 text-white' :
                     service.serviceType === 'offsite' ? 'bg-red-600 text-white' :
                     'bg-purple-600 text-white'
                 }`}>
                     {service.serviceType === 'onsite' ? 'Tại chỗ' :
                      service.serviceType === 'offsite' ? 'Tại nhà' : 'Cả hai'}
-                </span>
+                </p>
             </div>
             {service.maxBookings && (
                 <p className="text-gray-500 text-sm mb-4">

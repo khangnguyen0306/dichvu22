@@ -25,23 +25,23 @@ const ServiceCard = ({ service, index }) => (
                 src={service.images && service.images.length > 0 ? service.images[0] : '/placeholder-image.jpg'}
             />
             <div className="absolute top-3 right-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                <p className={`px-2 py-1 rounded-full text-xs font-bold ${
                     service.availability === 'available' 
                         ? 'bg-green-600 text-white' 
                         : 'bg-red-600 text-white'
                 }`}>
                     {service.availability === 'available' ? 'Có sẵn' : 'Không có sẵn'}
-                </span>
+                </p>
             </div>
             <div className="absolute bottom-3 left-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                <p className={`px-2 py-1 rounded-full text-xs font-bold ${
                     service.serviceType === 'onsite' ? 'bg-blue-600 text-white' :
                     service.serviceType === 'offsite' ? 'bg-red-600 text-white' :
                     'bg-purple-600 text-white'
                 }`}>
                     {service.serviceType === 'onsite' ? 'Tại chỗ' :
                      service.serviceType === 'offsite' ? 'Tại nhà' : 'Cả hai'}
-                </span>
+                </p>
             </div>
         </div>
         <div className="p-6 flex flex-col flex-grow">

@@ -830,21 +830,21 @@ const ServiceManagement = () => {
                   <td className="px-4 py-2">{service.price?.toLocaleString('vi-VN')} VND</td>
                   <td className="px-4 py-2">{service.duration} phút</td>
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
+                    <p className={`px-2 py-1 rounded text-xs ${
                       service.serviceType === 'onsite' ? 'bg-blue-600 text-white' :
                       service.serviceType === 'offsite ' ? 'bg-red-600 text-white' :
                       'bg-purple-600 text-white'
                     }`}>
                       {service.serviceType === 'onsite' ? 'Tại chỗ' :
                        service.serviceType === 'offsite ' ? 'Tại nhà' : 'Cả hai'}
-                    </span>
+                    </p>
                   </td>
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
+                    <p className={`px-2 py-1 rounded text-xs ${
                       service.availability === 'available' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
                     }`}>
                       {service.availability === 'available' ? 'Có sẵn' : 'Không có sẵn'}
-                    </span>
+                    </p>
                   </td>
                   <td className="px-4 py-2">
                     {Array.isArray(service.categories)

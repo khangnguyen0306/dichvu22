@@ -25,7 +25,7 @@ const packages = [
   {
     id: 3,
     name: 'Gói Doanh Nghiệp',
-    price: 899000,
+    price: 799000,
     duration: '12 tháng',
     description: 'Tối ưu chi phí cho shop/doanh nghiệp lớn.',
     highlight: false,

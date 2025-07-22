@@ -5,9 +5,9 @@ import { Users, Target, Eye } from 'lucide-react';
 
 const AboutUs = () => {
   const teamMembers = [
-    { name: 'Alex Johnson', role: 'CEO & Founder', image: 'https://randomuser.me/api/portraits/men/32.jpg', description: 'Người sáng lập và định hướng chiến lược phát triển.' },
-    { name: 'Maria Garcia', role: 'Lead Developer', image: 'https://randomuser.me/api/portraits/women/44.jpg', description: 'Chịu trách nhiệm phát triển và vận hành hệ thống.' },
-    { name: 'James Smith', role: 'Marketing Director', image: 'https://randomuser.me/api/portraits/men/65.jpg', description: 'Xây dựng thương hiệu và kết nối khách hàng.' },
+    { name: 'Đinh Quang Khương', role: 'CEO & Founder', image: 'https://i.pinimg.com/736x/90/8c/b9/908cb9d436c368e660a936dcde119c8a.jpg', description: 'Người sáng lập và định hướng chiến lược phát triển.' },
+    { name: 'Phạm Thanh Phương', role: 'Lead Marketing', image: 'https://i.pinimg.com/736x/75/dc/df/75dcdf5cf34baa783bc7d8cf375c4e69.jpg', description: ' Xây dựng thương hiệu và kết nối khách hàng.' },
+    { name: 'Đỗ Văn Mạnh', role: 'Lead IT', image: 'https://i.pinimg.com/736x/00/1e/13/001e13630531a4f82425e08388296f99.jpg', description: 'Chịu trách nhiệm phát triển và vận hành hệ thống.' },
   ];
 
   return (
@@ -114,7 +114,7 @@ const AboutUs = () => {
         </section>
 
         {/* Achievements/Stats Section */}
-        <section className="py-12">
+        {/* <section className="py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -162,7 +162,7 @@ const AboutUs = () => {
               <p className="text-gray-400">Năm thành lập</p>
             </motion.div>
           </div>
-        </section>
+        </section> */}
 
         <section>
           <h2 className="text-4xl font-bold text-center mb-10">Gặp Gỡ Đội Ngũ</h2>

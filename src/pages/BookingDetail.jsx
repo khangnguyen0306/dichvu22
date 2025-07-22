@@ -213,6 +213,39 @@ const BookingDetail = () => {
             return;
         }
 
+        // Validate booking date - không được đặt lịch trong quá khứ
+        const today = new Date();
+        const selectedDate = new Date(bookingData.bookingDate);
+        const todayString = today.toISOString().split('T')[0];
+        const selectedDateString = selectedDate.toISOString().split('T')[0];
+        
+        if (selectedDateString < todayString) {
+            toast({
+                title: "Ngày đặt lịch không hợp lệ",
+                description: "Không thể đặt lịch vào ngày trong quá khứ. Vui lòng chọn ngày từ hôm nay trở đi.",
+                variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Validate booking time - nếu đặt lịch trong ngày hôm nay, không được chọn giờ đã qua
+        if (selectedDateString === todayString) {
+            const currentTime = today.getHours() * 60 + today.getMinutes();
+            const [selectedHour, selectedMinute] = bookingData.bookingTime.split(':').map(Number);
+            const selectedTime = selectedHour * 60 + selectedMinute;
+            
+            if (selectedTime <= currentTime) {
+                toast({
+                    title: "Giờ đặt lịch không hợp lệ",
+                    description: "Không thể đặt lịch vào giờ đã qua. Vui lòng chọn thời gian trong tương lai.",
+                    variant: "destructive",
+                });
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
         // Validate service type
         if (service.serviceType === 'onsite' && bookingData.serviceType === 'offsite') {
             toast({

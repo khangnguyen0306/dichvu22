@@ -226,14 +226,14 @@ const ServiceDetail = () => {
                             </div>
                             <div className="flex items-center text-gray-400">
                                 <MapPin className="w-5 h-5 mr-1" />
-                                <span className={`px-2 py-1 rounded text-xs ${
+                                <p className={`px-2 py-1 rounded text-xs ${
                                     service.serviceType === 'onsite' ? 'bg-blue-600 text-white' :
                                     service.serviceType === 'offsite' ? 'bg-red-600 text-white' :
                                     'bg-purple-600 text-white'
                                 }`}>
                                     {service.serviceType === 'onsite' ? 'Tại chỗ' :
                                      service.serviceType === 'offsite' ? 'Tại nhà' : 'Cả hai'}
-                                </span>
+                                </p>
                             </div>
                         </div>
 

@@ -190,14 +190,14 @@ const Profile = () => {
 
     const getServiceTypeBadge = (serviceType) => {
         return (
-            <span className={`px-2 py-1 rounded text-xs font-bold ${
+            <p className={`px-2 py-1 rounded text-xs font-bold ${
                 serviceType === 'onsite' ? 'bg-blue-600 text-white' :
                 serviceType === 'offsite' ? 'bg-red-600 text-white' :
                 'bg-purple-600 text-white'
             }`}>
                 {serviceType === 'onsite' ? 'Tại chỗ' :
                  serviceType === 'offsite' ? 'Tại nhà' : 'Cả hai'}
-            </span>
+            </p>
         );
     };
 
