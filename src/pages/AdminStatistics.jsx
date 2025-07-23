@@ -100,7 +100,7 @@ const AdminStatistics = () => {
 
     const fetchShops = async () => {
         try {
-            const response = await dashboardService.getShops(currentMonth, currentYear);
+            const response = await dashboardService.getShops(currentMonth, currentYear, currentPage, 10);
             setShops(response.data);
         } catch (error) {
             console.error('Error fetching shops:', error);
@@ -517,6 +517,30 @@ const AdminStatistics = () => {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {shops && shops.pages > 1 && (
+                                    <div className="flex justify-center mt-6">
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                                disabled={currentPage === 1}
+                                            >
+                                                Trước
+                                            </Button>
+                                            <span className="px-4 py-2 text-gray-300">
+                                                Trang {currentPage} / {shops.pages}
+                                            </span>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setCurrentPage(Math.min(shops.pages, currentPage + 1))}
+                                                disabled={currentPage === shops.pages}
+                                            >
+                                                Sau
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
