@@ -22,9 +22,9 @@ export const dashboardService = {
     },
 
     // Get shops statistics
-    getShops: async (month, year) => {
+    getShops: async (month, year, page = 1, limit = 10) => {
         try {
-            const response = await api.get(`/dashboard/shops?month=${month}&year=${year}`);
+            const response = await api.get(`/dashboard/shops?month=${month}&year=${year}&page=${page}&limit=${limit}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Không thể tải thống kê cửa hàng');
